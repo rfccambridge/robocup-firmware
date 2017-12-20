@@ -37,7 +37,10 @@ void loop()  {
       }
     }
   }
-  Serial.println(".");
+  if (xbee.getResponse().isError()) {
+    // get the error code
+    Serial.print(xbee.getResponse().getErrorCode());
+  } 
 }
 
 
