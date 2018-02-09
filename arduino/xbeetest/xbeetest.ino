@@ -1,4 +1,4 @@
-  int speed1 = 60;
+  int speed1 = 40;
 void setup() {
   // put your setup code here, to run once:
  pinMode(8, OUTPUT); // 8 and 9 and back right 
@@ -70,7 +70,8 @@ void goForwardRight(){
   analogWrite(5, speed1*1.5);   
   digitalWrite(4, HIGH);    
   analogWrite(3, 0);   
-  digitalWrite(2, LOW);  rcm
+  digitalWrite(2, LOW);
+}
 
 void goBackLeft(){
   analogWrite(7, 0);
@@ -105,6 +106,46 @@ void goForwardLeft(){
   analogWrite(3, speed1*1.5);   
   digitalWrite(2, HIGH);  
 }
+
+
+
+/*
+void goForward(){
+  analogWrite(7, speed1);
+  digitalWrite(6, LOW);
+  analogWrite(9, speed1);
+  digitalWrite(8, LOW);  
+  analogWrite(5, speed1);   
+  digitalWrite(4, HIGH);    
+  analogWrite(3, speed1);   
+  digitalWrite(2, HIGH);  
+}*/
+
+void goRotateRight(){
+  analogWrite(7, speed1);
+  digitalWrite(6, HIGH);
+  analogWrite(9, speed1);
+  digitalWrite(8, HIGH);  
+  analogWrite(5, speed1);   
+  digitalWrite(4, HIGH);    
+  analogWrite(3, speed1);   
+  digitalWrite(2, HIGH);  
+}
+
+
+void goRotateLeft(){
+  analogWrite(7, speed1);
+  digitalWrite(6, LOW);
+  analogWrite(9, speed1);
+  digitalWrite(8, LOW);  
+  analogWrite(5, speed1);   
+  digitalWrite(4, LOW);    
+  analogWrite(3, speed1);   
+  digitalWrite(2, LOW);     
+}
+
+
+
 void stopAll(){
   analogWrite(7, 0);
   digitalWrite(6, LOW);
@@ -142,7 +183,17 @@ void loop() {
     {
       goRight();
     }
+    else if(receivedChar == 'q')
+    {
+      goRotateLeft();
+    }
+    else if(receivedChar == 'e')
+    {
+      goRotateRight();
+    }
   }
+
+  
 //  goForwardLeft();
 //  Serial.println(" backleft "); 
 //  delay(3000);
