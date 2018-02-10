@@ -104,8 +104,6 @@ void goForwardLeft(){
   digitalWrite(2, HIGH);  
 }
 
-
-
 void loop() {
   goForwardLeft();
   Serial.println(" backleft "); 
