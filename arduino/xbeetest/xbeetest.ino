@@ -1,4 +1,7 @@
+
   int speed1 = 40;
+  int BUF_SZ = 40;
+  int d = 1;
 void setup() {
   // put your setup code here, to run once:
  pinMode(8, OUTPUT); // 8 and 9 and back right 
@@ -157,41 +160,87 @@ void stopAll(){
   digitalWrite(2, HIGH);  
 }
 
+void makeMove(int* v){
+  analogWrite(3, abs(v[0]));
+  digitalWrite(2, (v[0] > 0) ? HIGH : LOW);
+  analogWrite(5, abs(v[1]));
+  digitalWrite(4, (v[1] > 0) ? HIGH : LOW);   
+  analogWrite(7, abs(v[2]));
+  digitalWrite(6, (v[2] > 0) ? HIGH : LOW);
+  analogWrite(9, abs(v[3]));
+  digitalWrite(8, (v[3] > 0) ? HIGH : LOW);
+ 
+ 
+}
+
+void transformation(int* v, int* result){
+  int x = -0.707 * (v[0] + v[1]);
+  int y = 0.707 * ( v[0] - v[1]);
+  result[0] = y + d * v[2];
+  result[1] = -1.0 * x + d * v[2];
+  result[2] = -1.0 * y + d * v[2];
+  result[3] = x + d * v[2];
+}
+
 
 void loop() {
-    char receivedChar;
    if (Serial1.available())
   { // If data comes in from XBee, send it out to serial monitor
-     receivedChar = Serial1.read();
-    if(receivedChar == 'c')
-    {
+    String receivedStr = Serial1.readStringUntil('\n');
+    char buf[BUF_SZ];
+    receivedStr.toCharArray(buf, sizeof(buf));
+    int v[3];
+    int transformed_v[4];
+    char *p = buf;
+    for (int i = 0; i < 3; i++){
+      v[i] = String(strtok_r(p, ",", &p)).toInt() / 100;
+    }
+     Serial1.println(v[0]);
+      Serial1.println(v[1]);
+      Serial1.println(v[2]);
+      Serial1.println("TRANSFORMED:");
+    if (v[0] == 0 && v[1] == 0 && v[2] == 0){
       stopAll();
-    }
-    else if(receivedChar == 'w')
-    {
-      goForward();
-    }
-    else if(receivedChar == 's')
-    {
-      goBackward();
-    }
-    else if(receivedChar == 'a')
-    {
-      goLeft();
-    }
-    else if(receivedChar == 'd')
-    {
-      goRight();
-    }
-    else if(receivedChar == 'q')
-    {
-      goRotateLeft();
-    }
-    else if(receivedChar == 'e')
-    {
-      goRotateRight();
+    } else {
+      transformation(v, transformed_v);
+      Serial1.println(transformed_v[0]);
+      Serial1.println(transformed_v[1]);
+      Serial1.println(transformed_v[2]);
+      Serial1.println(transformed_v[3]);
+      makeMove(transformed_v);
     }
   }
+    
+    
+//    if(receivedChar == 'c')
+//    {
+//      stopAll();
+//    }
+//    else if(receivedChar == 'w')
+//    {
+//      goForward();
+//    }
+//    else if(receivedChar == 's')
+//    {
+//      goBackward();
+//    }
+//    else if(receivedChar == 'a')
+//    {
+//      goLeft();
+//    }
+//    else if(receivedChar == 'd')
+//    {
+//      goRight();
+//    }
+//    else if(receivedChar == 'q')
+//    {
+//      goRotateLeft();
+//    }
+//    else if(receivedChar == 'e')
+//    {
+//      goRotateRight();
+//    }
+//  }
 
   
 //  goForwardLeft();
