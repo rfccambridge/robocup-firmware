@@ -6,12 +6,19 @@
 
 
 #define XBEE_BAUD_RATE 9600
-#define XBEE_USB_ADDR "/dev/ttyUSB0"
+#define XBEE_USB_ADDR "/dev/ttyUSB1"
 #define XBEE_MODEL_NO "xbee1"
-
+#define STOP "0,0,0"
+#define FORWARD "9000,0,0"
+#define BACKWARD "-9000,0,0"
+#define LEFT "0,-9000,0"
+#define RIGHT "0,9000,0"
+#define FORWARD_RIGHT "9000,0,2000"
+#define FORWARD_LEFT "9000,0,-2000"
 
 int main(void) {
 	int i;
+
 	void *d;
 	struct xbee *xbee;
 	struct xbee_con *con;
@@ -56,9 +63,32 @@ int main(void) {
 	char command[20];
 	for(;;) {
 		gets(command);
-		xbee_conTx(con, NULL, "%s\r\n", command);
-		if (strcmp(command, "q") == 0) {
-			break;
+		//xbee_conTx(con, NULL, "%s\r\n", command);
+		switch(command[0]){
+			case 'w':{
+				xbee_conTx(con, NULL, "%s\r\n", FORWARD);
+				break;
+			}
+			case 's':{
+				xbee_conTx(con, NULL, "%s\r\n", BACKWARD);
+				break;
+			}
+			case 'a':{
+				xbee_conTx(con, NULL, "%s\r\n", LEFT);
+				break;
+			}
+			case 'd':{
+				xbee_conTx(con, NULL, "%s\r\n", RIGHT);
+				break;
+			}
+			case 'e':{
+				xbee_conTx(con, NULL, "%s\r\n", FORWARD_RIGHT);
+				break;
+			}
+			case ' ':{
+				xbee_conTx(con, NULL, "%s\r\n", STOP);
+				break;
+			}
 		}
 	}
 

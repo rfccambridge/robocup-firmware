@@ -2,8 +2,11 @@ CC=gcc
 LFLAGS=-lxbee -lpthread -lrt 
 LIBFLAGS=-L/usr/lib/ -I/usr/include/
 
-all: terminal terminal_raw
+all: terminal terminal_raw terminal_directional
 
+
+terminal_directional:
+	$(CC) terminal_directional.c -o terminaldirectional $(LIBFLAGS) $(LFLAGS)
 
 terminal_raw:
 	$(CC) terminal_raw.c -o terminalraw $(LIBFLAGS) $(LFLAGS)
