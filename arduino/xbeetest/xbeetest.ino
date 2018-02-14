@@ -161,25 +161,25 @@ void stopAll(){
 }
 
 void makeMove(int* v){
-  analogWrite(3, abs(v[0]));
+  analogWrite(3, min(abs(v[0]), 255));
   digitalWrite(2, (v[0] > 0) ? HIGH : LOW);
-  analogWrite(5, abs(v[1]));
+  analogWrite(5, min(abs(v[1]), 255));
   digitalWrite(4, (v[1] > 0) ? HIGH : LOW);   
-  analogWrite(7, abs(v[2]));
+  analogWrite(7, min(abs(v[2]), 255));
   digitalWrite(6, (v[2] > 0) ? HIGH : LOW);
-  analogWrite(9, abs(v[3]));
+  analogWrite(9, min(abs(v[3]), 255));
   digitalWrite(8, (v[3] > 0) ? HIGH : LOW);
  
  
 }
 
 void transformation(int* v, int* result){
-  int x = -0.707 * (v[0] + v[1]);
-  int y = 0.707 * ( v[0] - v[1]);
-  result[0] = y + d * v[2];
-  result[1] = -1.0 * x + d * v[2];
-  result[2] = -1.0 * y + d * v[2];
-  result[3] = x + d * v[2];
+  int x = 0.707 * (v[0] - v[1]);
+  int y = 0.707 * ( v[0] + v[1]);
+  result[0] = -x + d * v[2];
+  result[1] = y + d * v[2];
+  result[2] = x + d * v[2];
+  result[3] = -y + d * v[2];
 }
 
 
@@ -193,20 +193,12 @@ void loop() {
     int transformed_v[4];
     char *p = buf;
     for (int i = 0; i < 3; i++){
-      v[i] = String(strtok_r(p, ",", &p)).toInt() / 100;
+      v[i] = String(strtok_r(p, ",", &p)).toInt();
     }
-     Serial1.println(v[0]);
-      Serial1.println(v[1]);
-      Serial1.println(v[2]);
-      Serial1.println("TRANSFORMED:");
     if (v[0] == 0 && v[1] == 0 && v[2] == 0){
       stopAll();
     } else {
       transformation(v, transformed_v);
-      Serial1.println(transformed_v[0]);
-      Serial1.println(transformed_v[1]);
-      Serial1.println(transformed_v[2]);
-      Serial1.println(transformed_v[3]);
       makeMove(transformed_v);
     }
   }

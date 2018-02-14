@@ -9,12 +9,12 @@
 #define XBEE_USB_ADDR "/dev/ttyUSB1"
 #define XBEE_MODEL_NO "xbee1"
 #define STOP "0,0,0"
-#define FORWARD "9000,0,0"
-#define BACKWARD "-9000,0,0"
-#define LEFT "0,-9000,0"
-#define RIGHT "0,9000,0"
-#define FORWARD_RIGHT "9000,0,2000"
-#define FORWARD_LEFT "9000,0,-2000"
+#define FORWARD "90,0,0"
+#define BACKWARD "-90,0,0"
+#define LEFT "0,-90,0"
+#define RIGHT "0,90,0"
+#define FORWARD_RIGHT "90,0,20"
+#define FORWARD_LEFT "90,0,-20"
 
 int main(void) {
 	int i;
