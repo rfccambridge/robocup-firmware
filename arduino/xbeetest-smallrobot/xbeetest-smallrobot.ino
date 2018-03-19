@@ -202,12 +202,14 @@ void loop() {
     String receivedStr = Serial1.readStringUntil('\n');
     char buf[BUF_SZ];
     receivedStr.toCharArray(buf, sizeof(buf));
+   
     int v[3];
     int transformed_v[4];
     char *p = buf;
     for (int i = 0; i < 3; i++){
       v[i] = String(strtok_r(p, ",", &p)).toInt();
     }
+    Serial.print(v[0]);
     if (v[0] == 0 && v[1] == 0 && v[2] == 0){
       stopAll();
     } else {
