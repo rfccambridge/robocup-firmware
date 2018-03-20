@@ -2,184 +2,197 @@
   int speed1 = 40;
   int BUF_SZ = 40;
   int d = 1;
+
+
+  int br1 = 8;
+  int br2 = 9;
+  int fr1 = 7;
+  int fr2 = 6;
+  int fl1 = 5;
+  int fl2 = 4; 
+  int bl1 = 3;
+  int bl2 = 2;
+  
 void setup() {
+
+  
   // put your setup code here, to run once:
- pinMode(8, OUTPUT); // 8 and 9 and back right 
-  pinMode(9, OUTPUT);
-   pinMode(7, OUTPUT); // 7 and 6 and front right
-  pinMode(6, OUTPUT);
-   pinMode(5, OUTPUT); // 5 and 4 and front left
-  pinMode(4, OUTPUT);
-   pinMode(3, OUTPUT); // 3 and 2 a dn back left
-  pinMode(2, OUTPUT);
-  analogWrite(7, 0);
-  analogWrite(9, 0); 
-  analogWrite(5, 0);    
-  analogWrite(3, 0);   
+ pinMode(br1, OUTPUT); // 8 and 9 and back right 
+  pinMode(br2, OUTPUT);
+   pinMode(fr1, OUTPUT); // 7 and 6 and front right
+  pinMode(fr2, OUTPUT);
+   pinMode(fl1, OUTPUT); // 5 and 4 and front left
+  pinMode(fl2, OUTPUT);
+   pinMode(bl1, OUTPUT); // 3 and 2 a dn back left
+  pinMode(bl2, OUTPUT);
+  analogWrite(fr1, 0);
+  analogWrite(br2, 0); 
+  analogWrite(fl1, 0);    
+  analogWrite(bl1, 0);   
    Serial1.begin(9600);
   Serial.begin(9600);
   //char receivedChar;
 }
 void goBackward(){
-  analogWrite(7, speed1);
-  digitalWrite(6, HIGH);
-  analogWrite(9, speed1);
-  digitalWrite(8, HIGH);  
-  analogWrite(5, speed1);   
-  digitalWrite(4, LOW);    
-  analogWrite(3, speed1);   
-  digitalWrite(2, LOW);  
+  analogWrite(fr1, speed1);
+  digitalWrite(fr2, HIGH);
+  analogWrite(br2, speed1);
+  digitalWrite(br1, HIGH);  
+  analogWrite(fl1, speed1);   
+  digitalWrite(fl2, LOW);    
+  analogWrite(bl1, speed1);   
+  digitalWrite(bl2, LOW);  
 }
 
 void goForward(){
-  analogWrite(7, speed1);
-  digitalWrite(6, LOW);
-  analogWrite(9, speed1);
-  digitalWrite(8, LOW);  
-  analogWrite(5, speed1);   
-  digitalWrite(4, HIGH);    
-  analogWrite(3, speed1);   
-  digitalWrite(2, HIGH);  
+  analogWrite(fr1, speed1);
+  digitalWrite(fr2, LOW);
+  analogWrite(br2, speed1);
+  digitalWrite(br1, LOW);  
+  analogWrite(fl1, speed1);   
+  digitalWrite(fl2, HIGH);    
+  analogWrite(bl1, speed1);   
+  digitalWrite(bl2, HIGH);  
 }
 
 void goLeft(){
-  analogWrite(7, speed1);
-  digitalWrite(6, LOW);
-  analogWrite(9, speed1);
-  digitalWrite(8, HIGH);  
-  analogWrite(5, speed1);   
-  digitalWrite(4, LOW);    
-  analogWrite(3, speed1);   
-  digitalWrite(2, HIGH);  
+  analogWrite(fr1, speed1);
+  digitalWrite(fr2, LOW);
+  analogWrite(br2, speed1);
+  digitalWrite(br1, HIGH);  
+  analogWrite(fl1, speed1);   
+  digitalWrite(fl2, LOW);    
+  analogWrite(bl1, speed1);   
+  digitalWrite(bl2, HIGH);  
 }
 
 
 void goRight(){
-  analogWrite(7, speed1);
-  digitalWrite(6, HIGH);
-  analogWrite(9, speed1);
-  digitalWrite(8, LOW);  
-  analogWrite(5, speed1);   
-  digitalWrite(4, HIGH);    
-  analogWrite(3, speed1);   
-  digitalWrite(2, LOW);  
+  analogWrite(fr1, speed1);
+  digitalWrite(fr2, HIGH);
+  analogWrite(br2, speed1);
+  digitalWrite(br1, LOW);  
+  analogWrite(fl1, speed1);   
+  digitalWrite(fl2, HIGH);    
+  analogWrite(bl1, speed1);   
+  digitalWrite(bl2, LOW);  
 }
 
 void goForwardRight(){
-  analogWrite(7, 0);
-  digitalWrite(6, HIGH);
-  analogWrite(9, speed1*1.5);
-  digitalWrite(8, LOW);  
-  analogWrite(5, speed1*1.5);   
-  digitalWrite(4, HIGH);    
-  analogWrite(3, 0);   
-  digitalWrite(2, LOW);
+  analogWrite(fr1, 0);
+  digitalWrite(fr2, HIGH);
+  analogWrite(br2, speed1*1.5);
+  digitalWrite(br1, LOW);  
+  analogWrite(fl1, speed1*1.5);   
+  digitalWrite(fl2, HIGH);    
+  analogWrite(bl1, 0);   
+  digitalWrite(bl2, LOW);
 }
 
 void goBackLeft(){
-  analogWrite(7, 0);
-  digitalWrite(6, HIGH);
-  analogWrite(9, speed1*1.5);
-  digitalWrite(8, LOW);  
-  analogWrite(5, speed1*1.5);   
-  digitalWrite(4, HIGH);    
-  analogWrite(3, 0);   
-  digitalWrite(2, LOW);  
+  analogWrite(fr1, 0);
+  digitalWrite(fr2, HIGH);
+  analogWrite(br2, speed1*1.5);
+  digitalWrite(br1, LOW);  
+  analogWrite(fl1, speed1*1.5);   
+  digitalWrite(fl2, HIGH);    
+  analogWrite(bl1, 0);   
+  digitalWrite(bl2, LOW);  
 }
 
 
 void goBackRight(){
-  analogWrite(7, speed1*1.5);
-  digitalWrite(6, HIGH);
-  analogWrite(9, 0);
-  digitalWrite(8, LOW);  
-  analogWrite(5, 0);   
-  digitalWrite(4, HIGH);    
-  analogWrite(3, speed1*1.5);   
-  digitalWrite(2, LOW);  
+  analogWrite(fr1, speed1*1.5);
+  digitalWrite(fr2, HIGH);
+  analogWrite(br2, 0);
+  digitalWrite(br1, LOW);  
+  analogWrite(fl1, 0);   
+  digitalWrite(fl2, HIGH);    
+  analogWrite(bl1, speed1*1.5);   
+  digitalWrite(bl2, LOW);  
 }
 
 void goForwardLeft(){
-  analogWrite(7, speed1*1.5);
-  digitalWrite(6, LOW);
-  analogWrite(9, 0);
-  digitalWrite(8, LOW);  
-  analogWrite(5, 0);   
-  digitalWrite(4, HIGH);    
-  analogWrite(3, speed1*1.5);   
-  digitalWrite(2, HIGH);  
+  analogWrite(fr1, speed1*1.5);
+  digitalWrite(fr2, LOW);
+  analogWrite(br2, 0);
+  digitalWrite(br1, LOW);  
+  analogWrite(fl1, 0);   
+  digitalWrite(fl2, HIGH);    
+  analogWrite(bl1, speed1*1.5);   
+  digitalWrite(bl2, HIGH);  
 }
 
 
 
 /*
 void goForward(){
-  analogWrite(7, speed1);
-  digitalWrite(6, LOW);
-  analogWrite(9, speed1);
-  digitalWrite(8, LOW);  
-  analogWrite(5, speed1);   
+  analogWrite(fr1, speed1);
+  digitalWrite(fr2, LOW);
+  analogWrite(br2, speed1);
+  digitalWrite(br1, LOW);  
+  analogWrite(fl1, speed1);   
   digitalWrite(4, HIGH);    
-  analogWrite(3, speed1);   
+  analogWrite(bl1, speed1);   
   digitalWrite(2, HIGH);  
 }*/
 
 void goRotateRight(){
-  analogWrite(7, speed1);
-  digitalWrite(6, HIGH);
-  analogWrite(9, speed1);
-  digitalWrite(8, HIGH);  
-  analogWrite(5, speed1);   
-  digitalWrite(4, HIGH);    
-  analogWrite(3, speed1);   
-  digitalWrite(2, HIGH);  
+  analogWrite(fr1, speed1);
+  digitalWrite(fr2, HIGH);
+  analogWrite(br2, speed1);
+  digitalWrite(br1, HIGH);  
+  analogWrite(fl1, speed1);   
+  digitalWrite(fl2, HIGH);    
+  analogWrite(bl1, speed1);   
+  digitalWrite(bl2, HIGH);  
 }
 
 
 void goRotateLeft(){
-  analogWrite(7, speed1);
-  digitalWrite(6, LOW);
-  analogWrite(9, speed1);
-  digitalWrite(8, LOW);  
-  analogWrite(5, speed1);   
-  digitalWrite(4, LOW);    
-  analogWrite(3, speed1);   
-  digitalWrite(2, LOW);     
+  analogWrite(fr1, speed1);
+  digitalWrite(fr2, LOW);
+  analogWrite(br2, speed1);
+  digitalWrite(br1, LOW);  
+  analogWrite(fl1, speed1);   
+  digitalWrite(fl2, LOW);    
+  analogWrite(bl1, speed1);   
+  digitalWrite(bl2, LOW);     
 }
 
 
 
 void stopAll(){
-  analogWrite(7, 0);
-  digitalWrite(6, LOW);
-  analogWrite(9, 0);
-  digitalWrite(8, LOW);  
-  analogWrite(5, 0);   
-  digitalWrite(4, HIGH);    
-  analogWrite(3, 0);   
-  digitalWrite(2, HIGH);  
+  analogWrite(fr1, 0);
+  digitalWrite(fr2, LOW);
+  analogWrite(br2, 0);
+  digitalWrite(br1, LOW);  
+  analogWrite(fl1, 0);   
+  digitalWrite(fl2, HIGH);    
+  analogWrite(bl1, 0);   
+  digitalWrite(bl2, HIGH);  
 }
 
 void makeMove(int* v){
-  analogWrite(3, abs(v[0]));
-  digitalWrite(2, (v[0] > 0) ? HIGH : LOW);
-  analogWrite(5, abs(v[1]));
-  digitalWrite(4, (v[1] > 0) ? HIGH : LOW);   
-  analogWrite(7, abs(v[2]));
-  digitalWrite(6, (v[2] > 0) ? HIGH : LOW);
-  analogWrite(9, abs(v[3]));
-  digitalWrite(8, (v[3] > 0) ? HIGH : LOW);
+  analogWrite(bl1, min(abs(v[0]), 255));
+  digitalWrite(bl2, (v[0] > 0) ? HIGH : LOW);
+  analogWrite(fl1, min(abs(v[1]), 255));
+  digitalWrite(fl2, (v[1] > 0) ? HIGH : LOW);   
+  analogWrite(fr1, min(abs(v[2]), 255));
+  digitalWrite(fr2, (v[2] > 0) ? HIGH : LOW);
+  analogWrite(br2, min(abs(v[3]), 255));
+  digitalWrite(br1, (v[3] > 0) ? HIGH : LOW);
  
  
 }
 
 void transformation(int* v, int* result){
-  int x = -0.707 * (v[0] + v[1]);
-  int y = 0.707 * ( v[0] - v[1]);
-  result[0] = y + d * v[2];
-  result[1] = -1.0 * x + d * v[2];
-  result[2] = -1.0 * y + d * v[2];
-  result[3] = x + d * v[2];
+  int x = 0.707 * (v[0] - v[1]);
+  int y = 0.707 * ( v[0] + v[1]);
+  result[0] = -x + d * v[2];
+  result[1] = y + d * v[2];
+  result[2] = x + d * v[2];
+  result[3] = -y + d * v[2];
 }
 
 
@@ -189,13 +202,14 @@ void loop() {
     String receivedStr = Serial1.readStringUntil('\n');
     char buf[BUF_SZ];
     receivedStr.toCharArray(buf, sizeof(buf));
+   
     int v[3];
     int transformed_v[4];
     char *p = buf;
     for (int i = 0; i < 3; i++){
-      v[i] = String(strtok_r(p, ",", &p)).toInt() / 100;
+      v[i] = String(strtok_r(p, ",", &p)).toInt();
     }
-//     Serial1.println(v[0]);
+//    Serial1.println(v[0]);
 //      Serial1.println(v[1]);
 //      Serial1.println(v[2]);
 //      Serial1.println("TRANSFORMED:");
@@ -248,11 +262,11 @@ void loop() {
 //  delay(3000);
   // put your main code here, to run repeatedly:
 //   analogWrite(7, 0);
-//  digitalWrite(6, HIGH);
-//  analogWrite(9, 0);
-//  digitalWrite(8, LOW);  
-//  analogWrite(5, speed1);   
-//  digitalWrite(4, HIGH);    
+//  digitalWrite(fr2, HIGH);
+//  analogWrite(br2, 0);
+//  digitalWrite(br1, LOW);  
+//  analogWrite(fl1, speed1);   
+//  digitalWrite(fl2, HIGH);    
 //  analogWrite(3, 0);   
 //  digitalWrite(2, LOW);  
 //  Serial.println(" backright "); 
