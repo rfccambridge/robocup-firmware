@@ -253,11 +253,11 @@ void loop() {
     Serial.print(" v[3]:  ");
     Serial.print(v[3]);
     Serial.print("\n");
+
     if (v[0] == 0 && v[1] == 0 && v[2] == 0){
       stopAll();
     } else {
       transformation(v, transformed_v);
-      
       makeMove(transformed_v);
     }
   }

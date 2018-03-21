@@ -202,16 +202,25 @@ void loop() {
     String receivedStr = Serial1.readStringUntil('\n');
     char buf[BUF_SZ];
     receivedStr.toCharArray(buf, sizeof(buf));
+   
     int v[3];
     int transformed_v[4];
     char *p = buf;
     for (int i = 0; i < 3; i++){
       v[i] = String(strtok_r(p, ",", &p)).toInt();
     }
+//    Serial1.println(v[0]);
+//      Serial1.println(v[1]);
+//      Serial1.println(v[2]);
+//      Serial1.println("TRANSFORMED:");
     if (v[0] == 0 && v[1] == 0 && v[2] == 0){
       stopAll();
     } else {
       transformation(v, transformed_v);
+//      Serial1.println(transformed_v[0]);
+//      Serial1.println(transformed_v[1]);
+//      Serial1.println(transformed_v[2]);
+//      Serial1.println(transformed_v[3]);
       makeMove(transformed_v);
     }
   }
