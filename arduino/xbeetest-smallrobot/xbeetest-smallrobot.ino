@@ -1,17 +1,21 @@
 
-  int speed1 = 40;
+  int speed1 = 25;
   int BUF_SZ = 40;
   int d = 1;
 
 
   int br1 = 8;
-  int br2 = 9;
-  int fr1 = 7;
-  int fr2 = 6;
-  int fl1 = 5;
-  int fl2 = 4; 
-  int bl1 = 3;
-  int bl2 = 2;
+  int br2 = 7;
+  int brspeed = 10;
+  int fr1 = 4;
+  int fr2 = 2;
+  int frspeed = 9;
+  int fl1 = 51;
+  int fl2 = 49; 
+  int flspeed = 11;
+  int bl1 = 45;
+  int bl2 = 43;
+  int blspeed = 13;
   
 void setup() {
 
@@ -25,10 +29,15 @@ void setup() {
   pinMode(fl2, OUTPUT);
    pinMode(bl1, OUTPUT); // 3 and 2 a dn back left
   pinMode(bl2, OUTPUT);
-  analogWrite(fr1, 0);
-  analogWrite(br2, 0); 
-  analogWrite(fl1, 0);    
-  analogWrite(bl1, 0);   
+
+  pinMode(frspeed, OUTPUT);
+  pinMode(brspeed, OUTPUT);
+  pinMode(flspeed, OUTPUT);
+  pinMode(blspeed, OUTPUT);
+  analogWrite(frspeed, 0);
+  analogWrite(brspeed, 0); 
+  analogWrite(flspeed, 0);    
+  analogWrite(blspeed, 0);   
    Serial1.begin(9600);
   Serial.begin(9600);
   //char receivedChar;
@@ -138,26 +147,34 @@ void goForward(){
 }*/
 
 void goRotateRight(){
-  analogWrite(fr1, speed1);
+  analogWrite(frspeed, speed1);
   digitalWrite(fr2, HIGH);
-  analogWrite(br2, speed1);
-  digitalWrite(br1, HIGH);  
-  analogWrite(fl1, speed1);   
-  digitalWrite(fl2, HIGH);    
-  analogWrite(bl1, speed1);   
-  digitalWrite(bl2, HIGH);  
+  digitalWrite(fr1, LOW);
+  analogWrite(brspeed, speed1);
+  digitalWrite(br1, LOW);
+  digitalWrite(br2, HIGH);  
+  analogWrite(flspeed, speed1);   
+  digitalWrite(fl2, LOW);
+  digitalWrite(fl1, HIGH);
+  analogWrite(blspeed, speed1);   
+  digitalWrite(bl2, LOW);  
+  digitalWrite(bl1, HIGH);
 }
 
 
 void goRotateLeft(){
-  analogWrite(fr1, speed1);
+    analogWrite(frspeed, speed1);
   digitalWrite(fr2, LOW);
-  analogWrite(br2, speed1);
-  digitalWrite(br1, LOW);  
-  analogWrite(fl1, speed1);   
-  digitalWrite(fl2, LOW);    
-  analogWrite(bl1, speed1);   
-  digitalWrite(bl2, LOW);     
+  digitalWrite(fr1, HIGH);
+  analogWrite(brspeed, speed1);
+  digitalWrite(br1, HIGH);
+  digitalWrite(br2, LOW);  
+  analogWrite(flspeed, speed1);   
+  digitalWrite(fl2, HIGH);
+  digitalWrite(fl1, LOW);
+  analogWrite(blspeed, speed1);   
+  digitalWrite(bl2, HIGH);  
+  digitalWrite(bl1, LOW);  
 }
 
 
@@ -174,16 +191,20 @@ void stopAll(){
 }
 
 void makeMove(int* v){
-  analogWrite(bl1, min(abs(v[0]), 255));
-  digitalWrite(bl2, (v[0] > 0) ? HIGH : LOW);
-  analogWrite(fl1, min(abs(v[1]), 255));
-  digitalWrite(fl2, (v[1] > 0) ? HIGH : LOW);   
-  analogWrite(fr1, min(abs(v[2]), 255));
-  digitalWrite(fr2, (v[2] > 0) ? HIGH : LOW);
-  analogWrite(br2, min(abs(v[3]), 255));
-  digitalWrite(br1, (v[3] > 0) ? HIGH : LOW);
- 
- 
+//Serial.print(v[0], DEC);    
+
+//  analogWrite(blspeed, min(abs(v[0]), 255));
+//  digitalWrite(bl1, (v[0] > 0) ? LOW : HIGH);
+//  digitalWrite(bl2, (v[0] > 0) ? HIGH : LOW);
+//  analogWrite(flspeed, min(abs(v[1]), 255));
+//  digitalWrite(fl1, (v[1] > 0) ? LOW : HIGH);
+//  digitalWrite(fl2, (v[1] > 0) ? HIGH : LOW);   
+//  analogWrite(frspeed, min(abs(v[2]), 255));
+//  digitalWrite(fr1, (v[2] > 0) ? LOW : HIGH);
+//  digitalWrite(fr2, (v[2] > 0) ? HIGH : LOW);
+//  analogWrite(brspeed, min(abs(v[3]), 255));
+//  digitalWrite(br2, (v[3] > 0) ? LOW : HIGH);
+//  digitalWrite(br1, (v[3] > 0) ? HIGH : LOW);
 }
 
 void transformation(int* v, int* result){
@@ -197,6 +218,7 @@ void transformation(int* v, int* result){
 
 
 void loop() {
+  //goRotateRight();
    if (Serial1.available())
   { // If data comes in from XBee, send it out to serial monitor
     String receivedStr = Serial1.readStringUntil('\n');
@@ -206,14 +228,36 @@ void loop() {
     int v[3];
     int transformed_v[4];
     char *p = buf;
+    Serial.print("john\n");
     for (int i = 0; i < 3; i++){
       v[i] = String(strtok_r(p, ",", &p)).toInt();
     }
-    Serial.print(v[0]);
+//    Serial.print(" v[0]:  ");
+//    Serial.print((int)buf[0]);
+//    Serial.print(" v[1]:  ");
+//    Serial.print((int)buf[1]);
+//    Serial.print(" v[2]:  ");
+//      for(int i = 0;  i< 40; i++){
+//         printf("%c",buf[i]);
+//      }
+      //Serial.println(receivedStr);
+//      for(int i =0; i < BUF_SZ; i++){
+//        Serial.print(buf[i], DEC);
+//      }
+//      Serial.print("\n");
+    delay(10);
+    Serial.print(" v[1]:  ");
+    Serial.print(v[1]);
+     Serial.print(" v[2]:  ");
+    Serial.print(v[2]);
+    Serial.print(" v[3]:  ");
+    Serial.print(v[3]);
+    Serial.print("\n");
     if (v[0] == 0 && v[1] == 0 && v[2] == 0){
       stopAll();
     } else {
       transformation(v, transformed_v);
+      
       makeMove(transformed_v);
     }
   }
