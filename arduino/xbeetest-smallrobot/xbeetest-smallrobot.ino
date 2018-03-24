@@ -163,7 +163,7 @@ void goRotateRight(){
 
 
 void goRotateLeft(){
-    analogWrite(frspeed, speed1);
+  analogWrite(frspeed, speed1);
   digitalWrite(fr2, LOW);
   digitalWrite(fr1, HIGH);
   analogWrite(brspeed, speed1);
@@ -193,18 +193,18 @@ void stopAll(){
 void makeMove(int* v){
 //Serial.print(v[0], DEC);    
 
-//  analogWrite(blspeed, min(abs(v[0]), 255));
-//  digitalWrite(bl1, (v[0] > 0) ? LOW : HIGH);
-//  digitalWrite(bl2, (v[0] > 0) ? HIGH : LOW);
-//  analogWrite(flspeed, min(abs(v[1]), 255));
-//  digitalWrite(fl1, (v[1] > 0) ? LOW : HIGH);
-//  digitalWrite(fl2, (v[1] > 0) ? HIGH : LOW);   
-//  analogWrite(frspeed, min(abs(v[2]), 255));
-//  digitalWrite(fr1, (v[2] > 0) ? LOW : HIGH);
-//  digitalWrite(fr2, (v[2] > 0) ? HIGH : LOW);
-//  analogWrite(brspeed, min(abs(v[3]), 255));
-//  digitalWrite(br2, (v[3] > 0) ? LOW : HIGH);
-//  digitalWrite(br1, (v[3] > 0) ? HIGH : LOW);
+  analogWrite(blspeed, min(abs(v[0]), 255));
+  digitalWrite(bl1, (v[0] > 0) ? LOW : HIGH);
+  digitalWrite(bl2, (v[0] > 0) ? HIGH : LOW);
+  analogWrite(flspeed, min(abs(v[1]), 255));
+  digitalWrite(fl1, (v[1] > 0) ? LOW : HIGH);
+  digitalWrite(fl2, (v[1] > 0) ? HIGH : LOW);   
+  analogWrite(frspeed, min(abs(v[2]), 255));
+  digitalWrite(fr1, (v[2] > 0) ? LOW : HIGH);
+  digitalWrite(fr2, (v[2] > 0) ? HIGH : LOW);
+  analogWrite(brspeed, min(abs(v[3]), 255));
+  digitalWrite(br2, (v[3] > 0) ? LOW : HIGH);
+  digitalWrite(br1, (v[3] > 0) ? HIGH : LOW);
 }
 
 void transformation(int* v, int* result){
@@ -228,36 +228,22 @@ void loop() {
     int v[3];
     int transformed_v[4];
     char *p = buf;
-    Serial.print("john\n");
-    for (int i = 0; i < 3; i++){
+     for (int i = 0; i < 3; i++){
       v[i] = String(strtok_r(p, ",", &p)).toInt();
     }
-//    Serial.print(" v[0]:  ");
-//    Serial.print((int)buf[0]);
-//    Serial.print(" v[1]:  ");
-//    Serial.print((int)buf[1]);
-//    Serial.print(" v[2]:  ");
-//      for(int i = 0;  i< 40; i++){
-//         printf("%c",buf[i]);
-//      }
-      //Serial.println(receivedStr);
-//      for(int i =0; i < BUF_SZ; i++){
-//        Serial.print(buf[i], DEC);
-//      }
-//      Serial.print("\n");
-    delay(10);
-    Serial.print(" v[1]:  ");
-    Serial.print(v[1]);
-     Serial.print(" v[2]:  ");
-    Serial.print(v[2]);
-    Serial.print(" v[3]:  ");
-    Serial.print(v[3]);
-    Serial.print("\n");
-
+//    Serial1.println("OHLOLOLO");
+//    Serial1.println(v[0]);
+//      Serial1.println(v[1]);
+//      Serial1.println(v[2]);
+//      Serial1.println("TRANSFORMED:");
     if (v[0] == 0 && v[1] == 0 && v[2] == 0){
       stopAll();
     } else {
       transformation(v, transformed_v);
+//      Serial1.println(transformed_v[0]);
+//      Serial1.println(transformed_v[1]);
+//      Serial1.println(transformed_v[2]);
+//      Serial1.println(transformed_v[3]);
       makeMove(transformed_v);
     }
   }
