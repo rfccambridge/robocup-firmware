@@ -1,5 +1,5 @@
 
-  int ID = 8;
+  int ID = 4;
   int speed1 = 20;
   int BUF_SZ = 40;
   int d = 1;
@@ -13,10 +13,10 @@
   int frspeed = 9;
   int fl1 = 51;
   int fl2 = 49; 
-  int flspeed = 11;
-  int bl1 = 45;
-  int bl2 = 43;
-  int blspeed = 13;
+  int flspeed = 45;
+  int bl1 = 43; // changed from 42
+  int bl2 = 42;
+  int blspeed = 46;
   
 void setup() {
 
@@ -186,9 +186,9 @@ void stopAll(){
   analogWrite(br2, 0);
   digitalWrite(br1, LOW);  
   analogWrite(fl1, 0);   
-  digitalWrite(fl2, HIGH);    
+  digitalWrite(fl2, LOW);    
   analogWrite(bl1, 0);   
-  digitalWrite(bl2, HIGH);  
+  digitalWrite(bl2, LOW);  
 }
 
 void makeMove(int* v){
