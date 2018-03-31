@@ -1,6 +1,6 @@
 
-  int ID = 5;
-  int speed1 = 25;
+  int ID = 8;
+  int speed1 = 20;
   int BUF_SZ = 40;
   int d = 1;
 
@@ -39,7 +39,7 @@ void setup() {
   analogWrite(brspeed, 0); 
   analogWrite(flspeed, 0);    
   analogWrite(blspeed, 0);   
-   Serial1.begin(9600);
+   Serial2.begin(9600);
   Serial.begin(9600);
   //char receivedChar;
 }
@@ -155,8 +155,8 @@ void goRotateRight(){
   digitalWrite(br1, LOW);
   digitalWrite(br2, HIGH);  
   analogWrite(flspeed, speed1);   
-  digitalWrite(fl2, LOW);
-  digitalWrite(fl1, HIGH);
+  digitalWrite(fl1, LOW);
+  digitalWrite(fl2, HIGH);
   analogWrite(blspeed, speed1);   
   digitalWrite(bl2, LOW);  
   digitalWrite(bl1, HIGH);
@@ -198,14 +198,14 @@ void makeMove(int* v){
   digitalWrite(bl1, (v[0] > 0) ? LOW : HIGH);
   digitalWrite(bl2, (v[0] > 0) ? HIGH : LOW);
   analogWrite(flspeed, min(abs(v[1]), 255));
-  digitalWrite(fl1, (v[1] > 0) ? LOW : HIGH);
-  digitalWrite(fl2, (v[1] > 0) ? HIGH : LOW);   
+  digitalWrite(fl2, (v[1] > 0) ? LOW : HIGH);
+  digitalWrite(fl1, (v[1] > 0) ? HIGH : LOW);   
   analogWrite(frspeed, min(abs(v[2]), 255));
   digitalWrite(fr1, (v[2] > 0) ? LOW : HIGH);
   digitalWrite(fr2, (v[2] > 0) ? HIGH : LOW);
   analogWrite(brspeed, min(abs(v[3]), 255));
-  digitalWrite(br2, (v[3] > 0) ? LOW : HIGH);
-  digitalWrite(br1, (v[3] > 0) ? HIGH : LOW);
+  digitalWrite(br1, (v[3] > 0) ? LOW : HIGH);
+  digitalWrite(br2, (v[3] > 0) ? HIGH : LOW);
 }
 
 void transformation(int* v, int* result){
@@ -219,13 +219,12 @@ void transformation(int* v, int* result){
 
 
 void loop() {
-  //goRotateRight();
-   if (Serial1.available())
+//  goRotateRight();
+   if (Serial2.available())
   { // If data comes in from XBee, send it out to serial monitor
-    String receivedStr = Serial1.readStringUntil('\n');
+    String receivedStr = Serial2.readStringUntil('\n');
     char buf[BUF_SZ];
     receivedStr.toCharArray(buf, sizeof(buf));
-   
     int v[3];
     int transformed_v[4];
     char *p = buf;
@@ -233,11 +232,11 @@ void loop() {
     for (int i = 0; i < 3; i++){
       v[i] = String(strtok_r(p, ",", &p)).toInt();
     }
-//    Serial.print(id);
-//    Serial.print(v[0]);
-//    Serial.print(v[1]);
-//    Serial.print(v[2]);
-//    Serial.println();
+    Serial.print(id);
+    Serial.print(v[0]);
+    Serial.print(v[1]);
+    Serial.print(v[2]);
+    Serial.println();
 //    Serial1.println("OHLOLOLO");
 //    Serial1.println(v[0]);
 //      Serial1.println(v[1]);
