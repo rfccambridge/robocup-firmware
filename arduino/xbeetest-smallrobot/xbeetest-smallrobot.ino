@@ -181,29 +181,33 @@ void goRotateLeft(){
 
 
 void stopAll(){
-  analogWrite(fr1, 0);
+  analogWrite(frspeed, 0);
+  digitalWrite(fr1, LOW);
   digitalWrite(fr2, LOW);
-  analogWrite(br2, 0);
-  digitalWrite(br1, LOW);  
-  analogWrite(fl1, 0);   
-  digitalWrite(fl2, LOW);    
-  analogWrite(bl1, 0);   
+   analogWrite(flspeed, 0);
+  digitalWrite(fl1, LOW);
+  digitalWrite(fl2, LOW);
+   analogWrite(brspeed, 0);
+  digitalWrite(br1, LOW);
+  digitalWrite(br2, LOW);
+   analogWrite(blspeed, 0);
+  digitalWrite(bl1, LOW);
   digitalWrite(bl2, LOW);  
 }
 
 void makeMove(int* v){
 //Serial.print(v[0], DEC);    
 
-  analogWrite(blspeed, min(abs(v[0]), 255));
+  analogWrite(blspeed, min(abs(v[0]), 100));
   digitalWrite(bl1, (v[0] > 0) ? LOW : HIGH);
   digitalWrite(bl2, (v[0] > 0) ? HIGH : LOW);
-  analogWrite(flspeed, min(abs(v[1]), 255));
-  digitalWrite(fl2, (v[1] > 0) ? LOW : HIGH);
-  digitalWrite(fl1, (v[1] > 0) ? HIGH : LOW);   
-  analogWrite(frspeed, min(abs(v[2]), 255));
+  analogWrite(flspeed, min(abs(v[1]), 100));
+  digitalWrite(fl1, (v[1] > 0) ? LOW : HIGH);
+  digitalWrite(fl2, (v[1] > 0) ? HIGH : LOW);   
+  analogWrite(frspeed, min(abs(v[2]), 100));
   digitalWrite(fr1, (v[2] > 0) ? LOW : HIGH);
   digitalWrite(fr2, (v[2] > 0) ? HIGH : LOW);
-  analogWrite(brspeed, min(abs(v[3]), 255));
+  analogWrite(brspeed, min(abs(v[3]), 100));
   digitalWrite(br1, (v[3] > 0) ? LOW : HIGH);
   digitalWrite(br2, (v[3] > 0) ? HIGH : LOW);
 }
@@ -232,11 +236,11 @@ void loop() {
     for (int i = 0; i < 3; i++){
       v[i] = String(strtok_r(p, ",", &p)).toInt();
     }
-    Serial.print(id);
-    Serial.print(v[0]);
-    Serial.print(v[1]);
-    Serial.print(v[2]);
-    Serial.println();
+//    Serial.print(id);
+//    Serial.print(v[0]);
+//    Serial.print(v[1]);
+//    Serial.print(v[2]);
+//    Serial.println();
 //    Serial1.println("OHLOLOLO");
 //    Serial1.println(v[0]);
 //      Serial1.println(v[1]);
@@ -247,6 +251,10 @@ void loop() {
         stopAll();
       } else {
         transformation(v, transformed_v);
+        Serial.print(transformed_v[0]);
+        Serial.print(transformed_v[1]);
+        Serial.print(transformed_v[2]);
+        Serial.print(transformed_v[3]);
         makeMove(transformed_v);
       }
     }
