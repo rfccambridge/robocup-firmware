@@ -1,5 +1,5 @@
 
-  int ID = 4;
+  int ID = 5;
   int speed1 = 20;
   int BUF_SZ = 40;
   int d = 1;
@@ -251,10 +251,10 @@ void loop() {
         stopAll();
       } else {
         transformation(v, transformed_v);
-        Serial.print(transformed_v[0]);
-        Serial.print(transformed_v[1]);
-        Serial.print(transformed_v[2]);
-        Serial.print(transformed_v[3]);
+//        Serial.print(transformed_v[0]);
+//        Serial.print(transformed_v[1]);
+//        Serial.print(transformed_v[2]);
+//        Serial.print(transformed_v[3]);
         makeMove(transformed_v);
       }
     }
