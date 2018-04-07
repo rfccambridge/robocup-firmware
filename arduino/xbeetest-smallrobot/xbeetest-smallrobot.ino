@@ -3,7 +3,7 @@
   int speed1 = 20;
   int BUF_SZ = 40;
   int d = 1;
-  float theta = 75.0 / 2;
+  float theta = 75.0 / 2 * PI / 180;
 
 
   int br1 = 8;
@@ -198,8 +198,6 @@ void stopAll(){
 
 void makeMove(int* v){
 //Serial.print(v[0], DEC);    
-  Serial.print("b1spd ");
-  Serial.println(v[0]);
   analogWrite(blspeed, min(abs(v[0]) + 15, 100));
   digitalWrite(bl1, (v[0] > 0) ? HIGH : LOW);
   digitalWrite(bl2, (v[0] < 0) ? HIGH : LOW);
@@ -218,6 +216,7 @@ void transformation(int* v, int* result){
   int x = v[0];
   int y = v[1];
 //  Serial.print(x);
+//  Serial.print(' ');
 //  Serial.print(y);
 //  Serial.println();
   result[0] = x * sin(theta) - y * cos(theta) + d * v[2];
@@ -225,8 +224,11 @@ void transformation(int* v, int* result){
   result[2] = -x * sin(theta) + y * cos(theta) + d * v[2];
   result[3] = x * sin(theta) + y * cos(theta) + d * v[2];
 //  Serial.print(result[1]);
+//  Serial.print(' ');
 //  Serial.print(result[2]);
+//  Serial.print(' ');
 //  Serial.print(result[0]);
+//  Serial.print(' ');
 //  Serial.print(result[3]);
 //  Serial.println();
 }
@@ -247,12 +249,11 @@ void loop() {
       v[i] = String(strtok_r(p, ",", &p)).toInt();
     }
 
-    Serial.print(id);
-    Serial.print(v[0]);
-    Serial.print(v[1]);
-    Serial.print(v[2]);
-    Serial.println();
-//    Serial1.println("OHLOLOLO");
+//    Serial.print(id);
+//    Serial.print(v[0]);
+//    Serial.print(v[1]);
+//    Serial.print(v[2]);
+//    Serial.println();
 //    Serial1.println(v[0]);
 //      Serial1.println(v[1]);
 //      Serial1.println(v[2]);
