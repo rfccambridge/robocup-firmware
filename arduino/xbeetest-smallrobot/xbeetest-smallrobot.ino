@@ -1,8 +1,9 @@
-
+ 
   int ID = 5;
   int speed1 = 20;
   int BUF_SZ = 40;
   int d = 1;
+  float theta = 75.0 / 2;
 
 
   int br1 = 8;
@@ -197,28 +198,37 @@ void stopAll(){
 
 void makeMove(int* v){
 //Serial.print(v[0], DEC);    
-
-  analogWrite(blspeed, min(abs(v[0]), 100));
-  digitalWrite(bl1, (v[0] > 0) ? LOW : HIGH);
-  digitalWrite(bl2, (v[0] > 0) ? HIGH : LOW);
-  analogWrite(flspeed, min(abs(v[1]), 100));
-  digitalWrite(fl1, (v[1] > 0) ? LOW : HIGH);
-  digitalWrite(fl2, (v[1] > 0) ? HIGH : LOW);   
-  analogWrite(frspeed, min(abs(v[2]), 100));
-  digitalWrite(fr1, (v[2] > 0) ? LOW : HIGH);
-  digitalWrite(fr2, (v[2] > 0) ? HIGH : LOW);
-  analogWrite(brspeed, min(abs(v[3]), 100));
-  digitalWrite(br1, (v[3] > 0) ? LOW : HIGH);
-  digitalWrite(br2, (v[3] > 0) ? HIGH : LOW);
+  Serial.print("b1spd ");
+  Serial.println(v[0]);
+  analogWrite(blspeed, min(abs(v[0]) + 15, 100));
+  digitalWrite(bl1, (v[0] > 0) ? HIGH : LOW);
+  digitalWrite(bl2, (v[0] < 0) ? HIGH : LOW);
+  analogWrite(flspeed, min(abs(v[1]) + 15, 100));
+  digitalWrite(fl1, (v[1] > 0) ? HIGH : LOW);
+  digitalWrite(fl2, (v[1] < 0) ? HIGH : LOW);   
+  analogWrite(frspeed, min(abs(v[2]) + 15, 100));
+  digitalWrite(fr1, (v[2] > 0) ? HIGH : LOW);
+  digitalWrite(fr2, (v[2] < 0) ? HIGH : LOW);
+  analogWrite(brspeed, min(abs(v[3]) + 15, 100));
+  digitalWrite(br1, (v[3] > 0) ? HIGH : LOW);
+  digitalWrite(br2, (v[3] < 0) ? HIGH : LOW);
 }
 
 void transformation(int* v, int* result){
-  int x = 0.707 * (v[0] - v[1]);
-  int y = 0.707 * ( v[0] + v[1]);
-  result[0] = -x + d * v[2];
-  result[1] = y + d * v[2];
-  result[2] = x + d * v[2];
-  result[3] = -y + d * v[2];
+  int x = v[0];
+  int y = v[1];
+//  Serial.print(x);
+//  Serial.print(y);
+//  Serial.println();
+  result[0] = x * sin(theta) - y * cos(theta) + d * v[2];
+  result[1] = -x * sin(theta) - y * cos(theta) + d * v[2];
+  result[2] = -x * sin(theta) + y * cos(theta) + d * v[2];
+  result[3] = x * sin(theta) + y * cos(theta) + d * v[2];
+//  Serial.print(result[1]);
+//  Serial.print(result[2]);
+//  Serial.print(result[0]);
+//  Serial.print(result[3]);
+//  Serial.println();
 }
 
 
@@ -236,11 +246,12 @@ void loop() {
     for (int i = 0; i < 3; i++){
       v[i] = String(strtok_r(p, ",", &p)).toInt();
     }
-//    Serial.print(id);
-//    Serial.print(v[0]);
-//    Serial.print(v[1]);
-//    Serial.print(v[2]);
-//    Serial.println();
+
+    Serial.print(id);
+    Serial.print(v[0]);
+    Serial.print(v[1]);
+    Serial.print(v[2]);
+    Serial.println();
 //    Serial1.println("OHLOLOLO");
 //    Serial1.println(v[0]);
 //      Serial1.println(v[1]);
