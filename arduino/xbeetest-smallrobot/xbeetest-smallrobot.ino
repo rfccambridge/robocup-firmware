@@ -215,22 +215,10 @@ void makeMove(int* v){
 void transformation(int* v, int* result){
   int x = v[0];
   int y = v[1];
-//  Serial.print(x);
-//  Serial.print(' ');
-//  Serial.print(y);
-//  Serial.println();
   result[0] = x * sin(theta) - y * cos(theta) + d * v[2];
   result[1] = -x * sin(theta) - y * cos(theta) + d * v[2];
   result[2] = -x * sin(theta) + y * cos(theta) + d * v[2];
   result[3] = x * sin(theta) + y * cos(theta) + d * v[2];
-//  Serial.print(result[1]);
-//  Serial.print(' ');
-//  Serial.print(result[2]);
-//  Serial.print(' ');
-//  Serial.print(result[0]);
-//  Serial.print(' ');
-//  Serial.print(result[3]);
-//  Serial.println();
 }
 
 
@@ -248,74 +236,13 @@ void loop() {
     for (int i = 0; i < 3; i++){
       v[i] = String(strtok_r(p, ",", &p)).toInt();
     }
-
-//    Serial.print(id);
-//    Serial.print(v[0]);
-//    Serial.print(v[1]);
-//    Serial.print(v[2]);
-//    Serial.println();
-//    Serial1.println(v[0]);
-//      Serial1.println(v[1]);
-//      Serial1.println(v[2]);
-//      Serial1.println("TRANSFORMED:");
     if (id == -1 || id == ID) {
       if (v[0] == 0 && v[1] == 0 && v[2] == 0){
         stopAll();
       } else {
         transformation(v, transformed_v);
-//        Serial.print(transformed_v[0]);
-//        Serial.print(transformed_v[1]);
-//        Serial.print(transformed_v[2]);
-//        Serial.print(transformed_v[3]);
         makeMove(transformed_v);
       }
     }
   }
-    
-    
-//    if(receivedChar == 'c')
-//    {
-//      stopAll();
-//    }
-//    else if(receivedChar == 'w')
-//    {
-//      goForward();
-//    }
-//    else if(receivedChar == 's')
-//    {
-//      goBackward();
-//    }
-//    else if(receivedChar == 'a')
-//    {
-//      goLeft();
-//    }
-//    else if(receivedChar == 'd')
-//    {
-//      goRight();
-//    }
-//    else if(receivedChar == 'q')
-//    {
-//      goRotateLeft();
-//    }
-//    else if(receivedChar == 'e')
-//    {
-//      goRotateRight();
-//    }
-//  }
-
-  
-//  goForwardLeft();
-//  Serial.println(" backleft "); 
-//  delay(3000);
-  // put your main code here, to run repeatedly:
-//   analogWrite(7, 0);
-//  digitalWrite(fr2, HIGH);
-//  analogWrite(br2, 0);
-//  digitalWrite(br1, LOW);  
-//  analogWrite(fl1, speed1);   
-//  digitalWrite(fl2, HIGH);    
-//  analogWrite(3, 0);   
-//  digitalWrite(2, LOW);  
-//  Serial.println(" backright "); 
-  //delay(3000);
 }
