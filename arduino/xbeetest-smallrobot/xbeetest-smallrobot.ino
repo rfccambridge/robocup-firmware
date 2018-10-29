@@ -20,8 +20,6 @@
   int blspeed = 46;
   
 void setup() {
-
-  
   // put your setup code here, to run once:
  pinMode(br1, OUTPUT); // 8 and 9 and back right 
   pinMode(br2, OUTPUT);
@@ -42,144 +40,7 @@ void setup() {
   analogWrite(blspeed, 0);   
    Serial2.begin(9600);
   Serial.begin(9600);
-  //char receivedChar;
 }
-void goBackward(){
-  analogWrite(fr1, speed1);
-  digitalWrite(fr2, HIGH);
-  analogWrite(br2, speed1);
-  digitalWrite(br1, HIGH);  
-  analogWrite(fl1, speed1);   
-  digitalWrite(fl2, LOW);    
-  analogWrite(bl1, speed1);   
-  digitalWrite(bl2, LOW);  
-}
-
-void goForward(){
-  analogWrite(fr1, speed1);
-  digitalWrite(fr2, LOW);
-  analogWrite(br2, speed1);
-  digitalWrite(br1, LOW);  
-  analogWrite(fl1, speed1);   
-  digitalWrite(fl2, HIGH);    
-  analogWrite(bl1, speed1);   
-  digitalWrite(bl2, HIGH);  
-}
-
-void goLeft(){
-  analogWrite(fr1, speed1);
-  digitalWrite(fr2, LOW);
-  analogWrite(br2, speed1);
-  digitalWrite(br1, HIGH);  
-  analogWrite(fl1, speed1);   
-  digitalWrite(fl2, LOW);    
-  analogWrite(bl1, speed1);   
-  digitalWrite(bl2, HIGH);  
-}
-
-
-void goRight(){
-  analogWrite(fr1, speed1);
-  digitalWrite(fr2, HIGH);
-  analogWrite(br2, speed1);
-  digitalWrite(br1, LOW);  
-  analogWrite(fl1, speed1);   
-  digitalWrite(fl2, HIGH);    
-  analogWrite(bl1, speed1);   
-  digitalWrite(bl2, LOW);  
-}
-
-void goForwardRight(){
-  analogWrite(fr1, 0);
-  digitalWrite(fr2, HIGH);
-  analogWrite(br2, speed1*1.5);
-  digitalWrite(br1, LOW);  
-  analogWrite(fl1, speed1*1.5);   
-  digitalWrite(fl2, HIGH);    
-  analogWrite(bl1, 0);   
-  digitalWrite(bl2, LOW);
-}
-
-void goBackLeft(){
-  analogWrite(fr1, 0);
-  digitalWrite(fr2, HIGH);
-  analogWrite(br2, speed1*1.5);
-  digitalWrite(br1, LOW);  
-  analogWrite(fl1, speed1*1.5);   
-  digitalWrite(fl2, HIGH);    
-  analogWrite(bl1, 0);   
-  digitalWrite(bl2, LOW);  
-}
-
-
-void goBackRight(){
-  analogWrite(fr1, speed1*1.5);
-  digitalWrite(fr2, HIGH);
-  analogWrite(br2, 0);
-  digitalWrite(br1, LOW);  
-  analogWrite(fl1, 0);   
-  digitalWrite(fl2, HIGH);    
-  analogWrite(bl1, speed1*1.5);   
-  digitalWrite(bl2, LOW);  
-}
-
-void goForwardLeft(){
-  analogWrite(fr1, speed1*1.5);
-  digitalWrite(fr2, LOW);
-  analogWrite(br2, 0);
-  digitalWrite(br1, LOW);  
-  analogWrite(fl1, 0);   
-  digitalWrite(fl2, HIGH);    
-  analogWrite(bl1, speed1*1.5);   
-  digitalWrite(bl2, HIGH);  
-}
-
-
-
-/*
-void goForward(){
-  analogWrite(fr1, speed1);
-  digitalWrite(fr2, LOW);
-  analogWrite(br2, speed1);
-  digitalWrite(br1, LOW);  
-  analogWrite(fl1, speed1);   
-  digitalWrite(4, HIGH);    
-  analogWrite(bl1, speed1);   
-  digitalWrite(2, HIGH);  
-}*/
-
-void goRotateRight(){
-  analogWrite(frspeed, speed1);
-  digitalWrite(fr2, HIGH);
-  digitalWrite(fr1, LOW);
-  analogWrite(brspeed, speed1);
-  digitalWrite(br1, LOW);
-  digitalWrite(br2, HIGH);  
-  analogWrite(flspeed, speed1);   
-  digitalWrite(fl1, LOW);
-  digitalWrite(fl2, HIGH);
-  analogWrite(blspeed, speed1);   
-  digitalWrite(bl2, LOW);  
-  digitalWrite(bl1, HIGH);
-}
-
-
-void goRotateLeft(){
-  analogWrite(frspeed, speed1);
-  digitalWrite(fr2, LOW);
-  digitalWrite(fr1, HIGH);
-  analogWrite(brspeed, speed1);
-  digitalWrite(br1, HIGH);
-  digitalWrite(br2, LOW);  
-  analogWrite(flspeed, speed1);   
-  digitalWrite(fl2, HIGH);
-  digitalWrite(fl1, LOW);
-  analogWrite(blspeed, speed1);   
-  digitalWrite(bl2, HIGH);  
-  digitalWrite(bl1, LOW);  
-}
-
-
 
 void stopAll(){
   analogWrite(frspeed, 0);
@@ -197,7 +58,6 @@ void stopAll(){
 }
 
 void makeMove(int* v){
-//Serial.print(v[0], DEC);    
   analogWrite(blspeed, min(abs(v[0]), 100));
   digitalWrite(bl1, (v[0] > 0) ? HIGH : LOW);
   digitalWrite(bl2, (v[0] < 0) ? HIGH : LOW);

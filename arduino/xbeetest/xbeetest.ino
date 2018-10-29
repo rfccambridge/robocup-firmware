@@ -33,136 +33,7 @@ void setup() {
   analogWrite(bl1, 0);   
    Serial1.begin(9600);
   Serial.begin(9600);
-  //char receivedChar;
 }
-void goBackward(){
-  analogWrite(fr1, speed1);
-  digitalWrite(fr2, HIGH);
-  analogWrite(br2, speed1);
-  digitalWrite(br1, HIGH);  
-  analogWrite(fl1, speed1);   
-  digitalWrite(fl2, LOW);    
-  analogWrite(bl1, speed1);   
-  digitalWrite(bl2, LOW);  
-}
-
-void goForward(){
-  analogWrite(fr1, speed1);
-  digitalWrite(fr2, LOW);
-  analogWrite(br2, speed1);
-  digitalWrite(br1, LOW);  
-  analogWrite(fl1, speed1);   
-  digitalWrite(fl2, HIGH);    
-  analogWrite(bl1, speed1);   
-  digitalWrite(bl2, HIGH);  
-}
-
-void goLeft(){
-  analogWrite(fr1, speed1);
-  digitalWrite(fr2, LOW);
-  analogWrite(br2, speed1);
-  digitalWrite(br1, HIGH);  
-  analogWrite(fl1, speed1);   
-  digitalWrite(fl2, LOW);    
-  analogWrite(bl1, speed1);   
-  digitalWrite(bl2, HIGH);  
-}
-
-
-void goRight(){
-  analogWrite(fr1, speed1);
-  digitalWrite(fr2, HIGH);
-  analogWrite(br2, speed1);
-  digitalWrite(br1, LOW);  
-  analogWrite(fl1, speed1);   
-  digitalWrite(fl2, HIGH);    
-  analogWrite(bl1, speed1);   
-  digitalWrite(bl2, LOW);  
-}
-
-void goForwardRight(){
-  analogWrite(fr1, 0);
-  digitalWrite(fr2, HIGH);
-  analogWrite(br2, speed1*1.5);
-  digitalWrite(br1, LOW);  
-  analogWrite(fl1, speed1*1.5);   
-  digitalWrite(fl2, HIGH);    
-  analogWrite(bl1, 0);   
-  digitalWrite(bl2, LOW);
-}
-
-void goBackLeft(){
-  analogWrite(fr1, 0);
-  digitalWrite(fr2, HIGH);
-  analogWrite(br2, speed1*1.5);
-  digitalWrite(br1, LOW);  
-  analogWrite(fl1, speed1*1.5);   
-  digitalWrite(fl2, HIGH);    
-  analogWrite(bl1, 0);   
-  digitalWrite(bl2, LOW);  
-}
-
-
-void goBackRight(){
-  analogWrite(fr1, speed1*1.5);
-  digitalWrite(fr2, HIGH);
-  analogWrite(br2, 0);
-  digitalWrite(br1, LOW);  
-  analogWrite(fl1, 0);   
-  digitalWrite(fl2, HIGH);    
-  analogWrite(bl1, speed1*1.5);   
-  digitalWrite(bl2, LOW);  
-}
-
-void goForwardLeft(){
-  analogWrite(fr1, speed1*1.5);
-  digitalWrite(fr2, LOW);
-  analogWrite(br2, 0);
-  digitalWrite(br1, LOW);  
-  analogWrite(fl1, 0);   
-  digitalWrite(fl2, HIGH);    
-  analogWrite(bl1, speed1*1.5);   
-  digitalWrite(bl2, HIGH);  
-}
-
-
-
-/*
-void goForward(){
-  analogWrite(fr1, speed1);
-  digitalWrite(fr2, LOW);
-  analogWrite(br2, speed1);
-  digitalWrite(br1, LOW);  
-  analogWrite(fl1, speed1);   
-  digitalWrite(4, HIGH);    
-  analogWrite(bl1, speed1);   
-  digitalWrite(2, HIGH);  
-}*/
-
-void goRotateRight(){
-  analogWrite(fr1, speed1);
-  digitalWrite(fr2, HIGH);
-  analogWrite(br2, speed1);
-  digitalWrite(br1, HIGH);  
-  analogWrite(fl1, speed1);   
-  digitalWrite(fl2, HIGH);    
-  analogWrite(bl1, speed1);   
-  digitalWrite(bl2, HIGH);  
-}
-
-
-void goRotateLeft(){
-  analogWrite(fr1, speed1);
-  digitalWrite(fr2, LOW);
-  analogWrite(br2, speed1);
-  digitalWrite(br1, LOW);  
-  analogWrite(fl1, speed1);   
-  digitalWrite(fl2, LOW);    
-  analogWrite(bl1, speed1);   
-  digitalWrite(bl2, LOW);     
-}
-
-
 
 void stopAll(){
   analogWrite(fr1, 0);
@@ -184,8 +55,6 @@ void makeMove(int* v){
   digitalWrite(fr2, (v[2] > 0) ? HIGH : LOW);
   analogWrite(br2, min(abs(v[3]), 255));
   digitalWrite(br1, (v[3] > 0) ? HIGH : LOW);
- 
- 
 }
 
 void transformation(int* v, int* result){
@@ -212,11 +81,6 @@ void loop() {
     for (int i = 0; i < 3; i++){
       v[i] = String(strtok_r(p, ",", &p)).toInt();
     }
-//    Serial.print(id);
-//    Serial.print(v[0]);
-//    Serial.print(v[1]);
-//    Serial.print(v[2]);
-//    Serial.println();
     if (id == -1 || id == ID) {
       if (v[0] == 0 && v[1] == 0 && v[2] == 0){
         stopAll();
