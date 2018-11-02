@@ -1,23 +1,24 @@
  
-  int ID = 5;
-  int speed1 = 20;
-  int BUF_SZ = 40;
-  int d = 1;
-  float theta = 75.0 / 2 * PI / 180;
+int ID = 5;
+int speed1 = 20;
+int BUF_SZ = 40;
+int d = 1;
+float theta = 75.0 / 2 * PI / 180;
 
 
-  int br1 = 8;
-  int br2 = 7;
-  int brspeed = 10;
-  int fr1 = 4;
-  int fr2 = 2;
-  int frspeed = 9;
-  int fl1 = 51;
-  int fl2 = 49; 
-  int flspeed = 45;
-  int bl1 = 43; // changed from 42
-  int bl2 = 42;
-  int blspeed = 46;
+
+int br1 = 8;
+int br2 = 7;
+int brspeed = 10;
+int fr1 = 4;
+int fr2 = 2;
+int frspeed = 9;
+int fl1 = 51;
+int fl2 = 49; 
+int flspeed = 45;
+int bl1 = 43; // changed from 42
+int bl2 = 42;
+int blspeed = 46;
   
 void setup() {
   // put your setup code here, to run once:
