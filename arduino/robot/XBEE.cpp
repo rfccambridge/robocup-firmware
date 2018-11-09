@@ -6,15 +6,15 @@ XBEE::XBEE(int init_id) {
 }
 
 void XBEE::setup() {
-    Serial2.begin(9600);
+    Serial5.begin(9600);
     if (XBEE_VERBOSE) {
         Serial.begin(9600);
     }
 }
 
 void XBEE::read_line(int* input) {
-    if (Serial2.available()) { 
-        String receivedStr = Serial2.readStringUntil('\n');
+    if (Serial5.available()) { 
+        String receivedStr = Serial5.readStringUntil('\n');
         char buf[BUF_SZ];
         receivedStr.toCharArray(buf, sizeof(buf));
         char *p = buf;
