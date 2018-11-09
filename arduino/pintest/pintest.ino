@@ -1,7 +1,5 @@
-#include <Adafruit_MCP23017.h>
+#include "Wire.h"
 
-// instantiate IO-expander object
-Adafruit_MCP23017 mcp;
 #define CHARGE 0
 #define CHARGE_STOP LOW
 #define CHARGE_START HIGH
@@ -25,7 +23,7 @@ Adafruit_MCP23017 mcp;
 #define INPUT_A_1 3
 #define INPUT_B_1 4
 #define ENABLE_1 5
-#define SPEED_1 20
+#define SPEED_1 10
 
 #define LED 13
 
@@ -35,7 +33,6 @@ Adafruit_MCP23017 mcp;
  */
 
 void setup() {
-  mcp.begin(1);
   Serial5.begin(9600);
   Serial.begin(9600);
  
@@ -46,14 +43,20 @@ void setup() {
   pinMode(CHIPENABLE, OUTPUT);
   pinMode(DRIBBLER, OUTPUT);
   pinMode(KICKENABLE, OUTPUT);  
-  mcp.pinMode(INPUT_A_1,OUTPUT);
-  mcp.pinMode(INPUT_B_1,OUTPUT);
-  mcp.pinMode(ENABLE_1,OUTPUT);
-  mcp.pinMode(1, OUTPUT);
-  mcp.pinMode(2, OUTPUT);
-  mcp.pinMode(3, OUTPUT);
-  mcp.pinMode(4, OUTPUT);
-  mcp.pinMode(5, OUTPUT);
+
+
+  
+  Wire.begin(); // wake up I2C bus
+// set I/O pins to outputs
+ Wire.beginTransmission(0x20);
+ Wire.write(0x00); // IODIRA register
+ Wire.write(0x00); // set all of port A to outputs
+ Wire.endTransmission();
+Wire.beginTransmission(0x20);
+ Wire.write(0x01); // IODIRB register
+ Wire.write(0x00); // set all of port B to outputs
+ Wire.endTransmission();
+  
   pinMode(SPEED_1, OUTPUT);
 
 }
@@ -66,19 +69,20 @@ void loop() {
    digitalWrite(CHIPENABLE, CHIPENABLE_OFF);
    digitalWrite(DRIBBLER, DRIBBLER_OFF);
 
-   mcp.digitalWrite(1, HIGH);
-   mcp.digitalWrite(2, HIGH);
-   mcp.digitalWrite(3, HIGH);
-   mcp.digitalWrite(4, HIGH);
-   mcp.digitalWrite(5, HIGH);
+  
    
    digitalWrite(LED, HIGH); 
-   mcp.digitalWrite(ENABLE_1, HIGH);
-   mcp.digitalWrite(INPUT_A_1, LOW);
-   mcp.digitalWrite(INPUT_B_1, HIGH);
-   analogWrite(SPEED_1, 50);
+   Wire.beginTransmission(0x20);
+Wire.write(0x13); // address port B 
+Wire.write(0x18);     // value to send
+Wire.endTransmission();
+   digitalWrite(LED, HIGH); 
+   analogWrite(SPEED_1, 40);
    delay(2000);
-   mcp.digitalWrite(ENABLE_1, LOW);
+   Wire.beginTransmission(0x20);
+    Wire.write(0x13); // address port B 
+    Wire.write(0x14);     // value to send
+    Wire.endTransmission();
    digitalWrite(LED, LOW);
    delay(2000);
   
