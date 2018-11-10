@@ -1,6 +1,9 @@
+#include "Encoder.h"
+
 #define ENCODER_A 27
 #define ENCODER_B 28
 
+Encoder encoder = Encoder(27, 28);
 void setup() {
   // put your setup code here, to run once:
   pinMode(ENCODER_A, INPUT);

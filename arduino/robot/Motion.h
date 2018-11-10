@@ -18,7 +18,6 @@ private:
     Motor &fr;
     Motor &bl;
     Motor &fl;
-
 };
 
 #endif
