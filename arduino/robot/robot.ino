@@ -10,10 +10,10 @@ XBEE xbee(5);
 
 void setup() {
   // put your setup code here, to run once:  
-//  xbee.s/etup();
-Serial.begin(9600);
-motor1.setup();
-motor2.setup();
+  // xbee.setup();
+  Serial.begin(9600);
+  motor1.setup();
+  motor2.setup();
   pinMode(LED, OUTPUT);
 }
 
@@ -25,11 +25,11 @@ void loop() {
 //  int* v = &input[1];
 
   digitalWrite(LED, HIGH);
-  motor1.turn(255);
-  motor2.turn(255);
+  motor1.turn(50);
+  motor2.turn(50);
   delay(2000);
   digitalWrite(LED, LOW);
-  motor1.turn(-1000);
-  motor2.turn(-1000);
+  motor1.turn(-50);
+  motor2.turn(-50);
   delay(2000);
 }
