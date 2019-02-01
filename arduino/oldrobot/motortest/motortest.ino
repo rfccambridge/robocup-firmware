@@ -1,10 +1,12 @@
-
+#define VERBOSE false
+  
   int ID = 8;
   
   int speed1 = 40;
   int BUF_SZ = 40;
   int d = 1;
 
+  unsigned long time_last_command = 0;
 
   int br1 = 8;
   int br2 = 9;
@@ -15,9 +17,7 @@
   int bl1 = 3;
   int bl2 = 2;
   
-void setup() {
-
-  
+void setup() {  
   // put your setup code here, to run once:
  pinMode(br1, OUTPUT); // 8 and 9 and back right 
   pinMode(br2, OUTPUT);
@@ -68,26 +68,17 @@ void transformation(int* v, int* result){
 
 
 void loop() {
-   if (Serial1.available())
-  { // If data comes in from XBee, send it out to serial monitor
-    String receivedStr = Serial1.readStringUntil('\n');
-    char buf[BUF_SZ];
-    receivedStr.toCharArray(buf, sizeof(buf));
 
     int v[3];
     int transformed_v[4];
-    char *p = buf;
-    int id = String(strtok_r(p, ",", &p)).toInt();
-    for (int i = 0; i < 3; i++){
-      v[i] = String(strtok_r(p, ",", &p)).toInt();
+
+    if ((millis() / 1000) % 2 == 0) {
+      v[0] = 30;
+    } else {
+      v[0] = -30;
     }
-    if (id == -1 || id == ID) {
-      if (v[0] == 0 && v[1] == 0 && v[2] == 0){
-        stopAll();
-      } else {
-        transformation(v, transformed_v);
-        makeMove(transformed_v);
-      }
-    }
-  }
+    v[1] = 0;
+    v[2] = 0; 
+    transformation(v, transformed_v);
+    makeMove(transformed_v);
 }
