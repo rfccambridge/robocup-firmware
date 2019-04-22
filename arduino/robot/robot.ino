@@ -34,23 +34,10 @@ void loop() {
 //  int id = input[0];
 //  int* v = &input[1];
 
-char buf[256];
-xbee.read_raw(buf);
-Serial.println(buf);
+  char buf[256];
+  xbee.read_raw(buf);
+  Serial.println(buf);
+  
+  motorBL.turn(50);  
 
-  //motorBL.turn(50);  
-  /*
-  digitalWrite(LED, HIGH);
-  motorBR.turn(50);
-  motorFR.turn(50);
-  motorBL.turn(50);
-  motorFL.turn(50);
-  delay(1000);
-  digitalWrite(LED, LOW);
-  motorBR.turn(-50);
-  motorFR.turn(-50);
-  motorBL.turn(-50);
-  motorFL.turn(-50);
-  delay(1000);
-  */
 }
