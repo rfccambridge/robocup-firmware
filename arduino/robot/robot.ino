@@ -4,16 +4,26 @@
 
 #define LED 13
 
-Motor motor1(0x20, 0x13, 4, 3, 5, 10, 27, 28);
-Motor motor2(0x20, 0x12, 6, 5, 4, 29, 27, 28);
+// Motor::Motor(int mcp_addr, int motor_addr, int cw_addr, 
+// int ccw_addr, int enable_addr, int speed_addr, 
+// int encoder_a, int encoder_b)
+Motor motorBR(0x20, 0x13, 14, 7, 5, 2, 27, 28);
+Motor motorFR(0x20, 0x12, 112, 224, 4, 3, 27, 28);
+Motor motorBL(0x24, 0x13, 14, 7, 5, 10, 27, 28);
+Motor motorFL(0x24, 0x12, 112, 224, 4, 29, 27, 28);
+
+// Motion(Motor& br, Motor& fr, Motor& bl, Motor& fl);
+Motion motion(motorBR, motorFR, motorBL, motorFL);
 XBEE xbee(5);
 
 void setup() {
   // put your setup code here, to run once:  
   // xbee.setup();
   Serial.begin(9600);
-  motor1.setup();
-  motor2.setup();
+  motorFR.setup();
+  motorBR.setup();
+  motorFL.setup();
+  motorBL.setup();
   pinMode(LED, OUTPUT);
 }
 
@@ -24,12 +34,23 @@ void loop() {
 //  int id = input[0];
 //  int* v = &input[1];
 
+char buf[256];
+xbee.read_raw(buf);
+Serial.println(buf);
+
+  //motorBL.turn(50);  
+  /*
   digitalWrite(LED, HIGH);
-  motor1.turn(50);
-  motor2.turn(50);
-  delay(2000);
+  motorBR.turn(50);
+  motorFR.turn(50);
+  motorBL.turn(50);
+  motorFL.turn(50);
+  delay(1000);
   digitalWrite(LED, LOW);
-  motor1.turn(-50);
-  motor2.turn(-50);
-  delay(2000);
+  motorBR.turn(-50);
+  motorFR.turn(-50);
+  motorBL.turn(-50);
+  motorFL.turn(-50);
+  delay(1000);
+  */
 }

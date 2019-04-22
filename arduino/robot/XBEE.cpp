@@ -24,3 +24,12 @@ void XBEE::read_line(int* input) {
         }
     }
 }
+
+void XBEE::read_raw(char* inputbuf) {
+    if (Serial5.available()) { 
+        String receivedStr = Serial5.readStringUntil('\n');
+        char buf[BUF_SZ];
+        receivedStr.toCharArray(buf, sizeof(buf));
+        memcpy(inputbuf, buf, BUF_SZ);
+    }
+}

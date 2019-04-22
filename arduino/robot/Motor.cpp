@@ -1,7 +1,8 @@
 #include "Arduino.h"
 #include "Motor.h"
 
-Motor::Motor(int mcp_addr, int motor_addr, int cw_addr, int ccw_addr, int enable_addr, int speed_addr, int encoder_a, int encoder_b)
+Motor::Motor(int mcp_addr, int motor_addr, int cw_addr, int ccw_addr, int enable_addr,
+             int speed_addr, int encoder_a, int encoder_b)
     : encoder(encoder_a, encoder_b), pid(&pid_input, &pid_output, &pid_set, 1, 0, 0, DIRECT) {
     // pins are 1 indexed for CW, CCW, enable
     mcp = mcp_addr;
@@ -30,18 +31,25 @@ void Motor::setup() {
 }
 
 void Motor::turn(int turn_speed) {
-    pid_set = turn_speed;
-    pid_input = encoder.read();
-    encoder.write(0);
-    pid.Compute();
-    int command = (1 << (enable - 1)) | (1 << (((pid_output > 0) ? cw : ccw) - 1)); 
-
+    // pid_set = turn_speed;
+    // pid_input = encoder.read();
+    // encoder.write(0);
+    // pid.Compute();
+    // int command = (1 << (enable - 1)) | (1 << (((pid_output > 0) ? cw : ccw) - 1)); 
+    unsigned int command = 0;
+    command |= (turn_speed > 0) ? cw : ccw;
     Wire.beginTransmission(mcp);
     Wire.write(motor); 
     Wire.write(command);
     Wire.endTransmission();
-    analogWrite(speed, abs(pid_output));
+    analogWrite(speed, abs(turn_speed));
+    // analogWrite(speed, abs(pid_output));
 }
+/*
+void Motor::fastbreak() {
+
+}
+*/
 
 void Motor::stop() {
     Wire.beginTransmission(mcp);

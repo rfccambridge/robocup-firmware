@@ -50,24 +50,19 @@ void setup() {
 }
 
 void loop() {
-  // Disable charging and kick
+  // IMMMA CHARGIN MY LASERRRRRRRRRRRR XDDDDDDDD
    digitalWrite(CHARGE, CHARGE_START);
    digitalWrite(KICKENABLE, KICKENABLE_OFF);
    digitalWrite(DISCHARGE, DISCHARGE_OFF);
    digitalWrite(CHIPENABLE, CHIPENABLE_ON);
    digitalWrite(DRIBBLER, DRIBBLER_OFF);
-
-  
-   
    digitalWrite(LED, LOW); 
+   delay(4000);
 
-   delay(8000);
-   
+
+   // FIRE 
    digitalWrite(LED, HIGH); 
-      digitalWrite(CHARGE, CHARGE_STOP);
+   digitalWrite(CHARGE, CHARGE_STOP);
    digitalWrite(KICKENABLE, KICKENABLE_ON);
-   digitalWrite(KICKENABLE, DISCHARGE_ON);
-   delay(2000);
-
-
+   delay(200);
 }
