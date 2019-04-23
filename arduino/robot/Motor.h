@@ -20,7 +20,7 @@ private:
     int cw;
     int ccw;
     int enable;
-    int speed;
+    int spd;
     Encoder encoder;
     double pid_input;
     double pid_output;
