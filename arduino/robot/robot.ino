@@ -76,4 +76,16 @@ void loop() {
   motorFL.turn(-50);
   delay(1000);
   */
+  // put your main code here, to run repeatedly:
+//  int input[4];
+//  xbee.read_line(input);
+//  int id = input[0];
+//  int* v = &input[1];
+
+  char buf[256];
+  xbee.read_raw(buf);
+  Serial.println(buf);
+  
+  motorBL.turn(50);  
+
 }
