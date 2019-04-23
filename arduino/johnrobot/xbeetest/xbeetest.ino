@@ -112,9 +112,10 @@ void makeMove(int* v){
   digitalWrite(br1, (v[3] > 0) ? HIGH : LOW);
 }
 
+
 void transformation(int* v, int* result){
   int x = 0.707 * (v[0] - v[1]);
-  int y = 0.707 * ( v[0] + v[1]);
+  int y = 0.707 * (v[0] + v[1]);
   result[0] = -x + d * v[2];
   result[1] = y + d * v[2];
   result[2] = x + d * v[2];

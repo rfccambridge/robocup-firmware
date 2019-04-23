@@ -9,7 +9,7 @@
 
 class Motion {
 public:
-    Motion(Motor&, Motor&, Motor&, Motor&);
+    Motion(Motor& br, Motor& fr, Motor& bl, Motor& fl);
     void setup();
     void move(int, int, int);
     void stop();

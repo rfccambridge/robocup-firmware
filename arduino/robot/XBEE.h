@@ -11,6 +11,7 @@ public:
     XBEE(int);
     int id;
     void read_line(int*);
+    void read_raw(char*);
     void setup();
 };
 

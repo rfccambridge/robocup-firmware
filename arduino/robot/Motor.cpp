@@ -1,7 +1,8 @@
 #include "Arduino.h"
 #include "Motor.h"
 
-Motor::Motor(int mcp_addr, int motor_addr, int cw_addr, int ccw_addr, int enable_addr, int speed_addr, int encoder_a, int encoder_b)
+Motor::Motor(int mcp_addr, int motor_addr, int cw_addr, int ccw_addr, int enable_addr,
+             int spd_addr, int encoder_a, int encoder_b)
     : encoder(encoder_a, encoder_b), pid(&pid_input, &pid_output, &pid_set, 1, 0, 0, DIRECT) {
     // pins are 1 indexed for CW, CCW, enable
     mcp = mcp_addr;
@@ -9,7 +10,7 @@ Motor::Motor(int mcp_addr, int motor_addr, int cw_addr, int ccw_addr, int enable
     cw = cw_addr;
     ccw = ccw_addr;
     enable = enable_addr;
-    speed = speed_addr;
+    spd = spd_addr;
     pid.SetOutputLimits(-SPEED_CAP, SPEED_CAP);
 }
 
@@ -23,25 +24,30 @@ void Motor::setup() {
     Wire.write(0x01); // IODIRB register
     Wire.write(0x00); // set all of port B to outputs
     Wire.endTransmission();
-    pinMode(speed, OUTPUT);
+    pinMode(spd, OUTPUT);
     encoder.write(0);
     pid.SetMode(AUTOMATIC);
     Serial.begin(9600);
 }
 
-void Motor::turn(int turn_speed) {
-    pid_set = turn_speed;
-    pid_input = encoder.read();
-    encoder.write(0);
-    pid.Compute();
-    int command = (1 << (enable - 1)) | (1 << (((pid_output > 0) ? cw : ccw) - 1)); 
+void Motor::turn(int turn_spd) {
+    unsigned int command = 0;
+    if (turn_spd != 0) {
+      command |= (turn_spd > 0) ? cw : ccw;
+    }
+        analogWrite(spd, abs(turn_spd));
 
     Wire.beginTransmission(mcp);
     Wire.write(motor); 
     Wire.write(command);
     Wire.endTransmission();
-    analogWrite(speed, abs(pid_output));
+    // analogWrite(spd, abs(pid_output));
 }
+/*
+void Motor::fastbreak() {
+
+}
+*/
 
 void Motor::stop() {
     Wire.beginTransmission(mcp);

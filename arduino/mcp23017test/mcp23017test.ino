@@ -79,10 +79,10 @@ Wire.beginTransmission(0x24);
  
  //binaryCount();
    digitalWrite(LED, HIGH); 
-   analogWrite(SPEED_1, 255);
-   analogWrite(SPEED_2, 255);
-   analogWrite(SPEED_3, 255);
-   analogWrite(SPEED_4, 255);
+   analogWrite(SPEED_1, 100);
+   analogWrite(SPEED_2, 100);
+   analogWrite(SPEED_3, 100);
+   analogWrite(SPEED_4, 100);
    delay(2000);
    Wire.beginTransmission(0x20);
     Wire.write(0x13); // address port B 
