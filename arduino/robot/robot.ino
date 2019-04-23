@@ -1,8 +1,12 @@
 #include "Motion.h"
 #include "XBEE.h"
+#include "Encoder.h"
 #include "Motor.h"
 
 #define LED 13
+
+#define RH_ENCODER_A 14
+#define RH_ENCODER_B 15
 
 // Motor::Motor(int mcp_addr, int motor_addr, int cw_addr, 
 // int ccw_addr, int enable_addr, int speed_addr, 
@@ -16,15 +20,49 @@ Motor motorFL(0x24, 0x13, 14,    7, 4, 29, 27, 28);
 Motion motion(motorBR, motorFR, motorBL, motorFL);
 XBEE xbee(5);
 
+int input[4];
+
+volatile unsigned long rightCount = 0;
+
+void rightEncoderEvent() {
+  Serial.println("FUCK YOU");
+  Serial.println(digitalRead(RH_ENCODER_A));
+  Serial.println(digitalRead(RH_ENCODER_B));
+  rightCount += (digitalRead(RH_ENCODER_A) == digitalRead(RH_ENCODER_B)) ? -1 : 1;
+//  if (digitalRead(RH_ENCODER_A) == HIGH) {
+//    if (digitalRead(RH_ENCODER_B) == LOW) {
+//      rightCount++;
+//    } else {
+//      rightCount--;
+//    }
+//  } else {
+//    if (digitalRead(RH_ENCODER_B) == LOW) {
+//      rightCount--;
+//    } else {
+//      rightCount++;
+//    }
+//  }
+}
+
 void setup() {
+  pinMode(RH_ENCODER_A, INPUT);
+  pinMode(RH_ENCODER_B, INPUT);
+  attachInterrupt(1, rightEncoderEvent, CHANGE);
+  
   // put your setup code here, to run once:  
   xbee.setup();
-  Serial.begin(9600);
-  motorFR.setup();
   motorBR.setup();
-  motorFL.setup();
+  motorFR.setup();
   motorBL.setup();
+  motorFL.setup();
+  Serial.begin(9600);
   pinMode(LED, OUTPUT);
+
+  for (int i = 0; i < 4; i++) {
+    input[i] = 0;
+  }
+
+  
 }
 
 void loop() {
@@ -50,8 +88,13 @@ void loop() {
 //  motorBL.turn(50);
 //  motorFL.turn(50);
 //  char buf[256];
-  int input[4];
   xbee.read_line(input);
+ 
+  Serial.println(motorBR.position());
+  Serial.println(motorFR.position());
+  Serial.print("Right Count: ");
+  Serial.println(rightCount);
+  Serial.println();
   Serial.print(input[0]);
   Serial.print(",");
   Serial.print(input[1]);
@@ -82,10 +125,10 @@ void loop() {
 //  int id = input[0];
 //  int* v = &input[1];
 
-  char buf[256];
-  xbee.read_raw(buf);
-  Serial.println(buf);
-  
-  motorBL.turn(50);  
+//  char buf[256];
+//  xbee.read_raw(buf);
+//  Serial.println(buf);
+//  
+//  motorBL.turn(50);  
 
 }

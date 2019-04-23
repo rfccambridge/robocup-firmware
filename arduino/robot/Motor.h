@@ -14,6 +14,8 @@ public:
     void turn(int);
     void setup();
     void stop();
+    int position();
+    void reset_position();
 private:
     int mcp;
     int motor;

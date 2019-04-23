@@ -1,25 +1,30 @@
-#define ENCODER_A 27
-#define ENCODER_B 28
+#define encoder0PinA  25
+#define encoder0PinB  26
+
+volatile int encoder0Pos = 0;
 
 void setup() {
-  // put your setup code here, to run once:
-  pinMode(ENCODER_A, INPUT);
-  pinMode(ENCODER_B, INPUT);
-//  pinMode(13, OUTPUT);     
-  Serial.begin(9600);
+  pinMode(encoder0PinA, INPUT);
+  pinMode(encoder0PinB, INPUT);
+
+  // encoder pin on interrupt 0 (pin 2)
+  attachInterrupt(encoder0PinA, doEncoderA, CHANGE);
+
+  // encoder pin on interrupt 1 (pin 3)
+  attachInterrupt(encoder0PinB, doEncoderB, CHANGE);
+
+  Serial.begin (9600);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-//  digitalWrite(13, HIGH);   // turn the LED on (HIGH is the voltage level)
-//  delay(1000);               // wait for a second
-//  digitalWrite(13, LOW);    // turn the LED off by making the voltage LOW
-//  delay(1000);
-  Serial.print("HELLO\t"); 
+  Serial.println(encoder0Pos);
   delay(100);
-  int aState = digitalRead(ENCODER_A);
-  int bState = digitalRead(ENCODER_B);
-  Serial.print(aState);
-  Serial.print("\t");
-  Serial.println(bState);
+}
+
+void doEncoderA() {
+  encoder0Pos += (digitalRead(encoder0PinA) == digitalRead(encoder0PinB)) ? -1 : 1;
+}
+
+void doEncoderB() {
+   encoder0Pos += (digitalRead(encoder0PinA) == digitalRead(encoder0PinB)) ? 1 : -1;
 }

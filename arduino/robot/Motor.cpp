@@ -27,7 +27,6 @@ void Motor::setup() {
     pinMode(spd, OUTPUT);
     encoder.write(0);
     pid.SetMode(AUTOMATIC);
-    Serial.begin(9600);
 }
 
 void Motor::turn(int turn_spd) {
@@ -42,6 +41,14 @@ void Motor::turn(int turn_spd) {
     Wire.write(command);
     Wire.endTransmission();
     // analogWrite(spd, abs(pid_output));
+}
+
+int Motor::position() {
+    return encoder.read();
+}
+
+void Motor::reset_position() {
+    encoder.write(0);
 }
 /*
 void Motor::fastbreak() {
