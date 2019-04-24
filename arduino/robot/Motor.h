@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 #include "Wire.h"
-#include "Encoder.h"
+#include "MotorEncoder.h"
 #include "PID_v1.h"
 
 #define SPEED_CAP 255
@@ -16,6 +16,7 @@ public:
     void stop();
     int position();
     void reset_position();
+    MotorEncoder encoder;
 private:
     int mcp;
     int motor;
@@ -23,7 +24,6 @@ private:
     int ccw;
     int enable;
     int spd;
-    Encoder encoder;
     double pid_input;
     double pid_output;
     double pid_set;

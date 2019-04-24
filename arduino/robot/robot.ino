@@ -1,60 +1,50 @@
 #include "Motion.h"
 #include "XBEE.h"
-#include "Encoder.h"
+#include "MotorEncoder.h"
 #include "Motor.h"
 
 #define LED 13
 
-#define RH_ENCODER_A 14
-#define RH_ENCODER_B 15
-
 // Motor::Motor(int mcp_addr, int motor_addr, int cw_addr, 
 // int ccw_addr, int enable_addr, int speed_addr, 
 // int encoder_a, int encoder_b)
-Motor motorBR(0x20, 0x13, 14,    7, 5,  2, 27, 28);
-Motor motorFR(0x20, 0x12, 112, 224, 4,  3, 27, 28);
-Motor motorBL(0x24, 0x12, 112, 224, 5, 10, 27, 28);
-Motor motorFL(0x24, 0x13, 14,    7, 4, 29, 27, 28);
+Motor motor_br(0x20, 0x13, 14,    7, 5,  2, 16, 17);
+Motor motor_fr(0x20, 0x12, 112, 224, 4,  3, 27, 28);
+Motor motor_bl(0x24, 0x12, 112, 224, 5, 10, 14, 15);
+Motor motor_fl(0x24, 0x13, 14,    7, 4, 29, 25, 26);
+
 
 // Motion(Motor& br, Motor& fr, Motor& bl, Motor& fl);
-Motion motion(motorBR, motorFR, motorBL, motorFL);
+Motion motion(motor_br, motor_fr, motor_bl, motor_fl);
 XBEE xbee(5);
 
 int input[4];
 
-volatile unsigned long rightCount = 0;
+void update_encoder_br_a() { motor_br.encoder.update_a(); }
+void update_encoder_br_b() { motor_br.encoder.update_b(); }
+void update_encoder_fr_a() { motor_fr.encoder.update_a(); }
+void update_encoder_fr_b() { motor_fr.encoder.update_b(); }
+void update_encoder_bl_a() { motor_bl.encoder.update_a(); }
+void update_encoder_bl_b() { motor_bl.encoder.update_b(); }
+void update_encoder_fl_a() { motor_fl.encoder.update_a(); }
+void update_encoder_fl_b() { motor_fl.encoder.update_b(); }
 
-void rightEncoderEvent() {
-  Serial.println("FUCK YOU");
-  Serial.println(digitalRead(RH_ENCODER_A));
-  Serial.println(digitalRead(RH_ENCODER_B));
-  rightCount += (digitalRead(RH_ENCODER_A) == digitalRead(RH_ENCODER_B)) ? -1 : 1;
-//  if (digitalRead(RH_ENCODER_A) == HIGH) {
-//    if (digitalRead(RH_ENCODER_B) == LOW) {
-//      rightCount++;
-//    } else {
-//      rightCount--;
-//    }
-//  } else {
-//    if (digitalRead(RH_ENCODER_B) == LOW) {
-//      rightCount--;
-//    } else {
-//      rightCount++;
-//    }
-//  }
-}
-
-void setup() {
-  pinMode(RH_ENCODER_A, INPUT);
-  pinMode(RH_ENCODER_B, INPUT);
-  attachInterrupt(1, rightEncoderEvent, CHANGE);
-  
-  // put your setup code here, to run once:  
+void setup() {  
   xbee.setup();
-  motorBR.setup();
-  motorFR.setup();
-  motorBL.setup();
-  motorFL.setup();
+  motor_br.setup();
+  motor_fr.setup();
+  motor_bl.setup();
+  motor_fl.setup();
+  
+  attachInterrupt(motor_br.encoder.encoder_a, update_encoder_br_a, CHANGE);
+  attachInterrupt(motor_br.encoder.encoder_b, update_encoder_br_b, CHANGE);
+  attachInterrupt(motor_fr.encoder.encoder_a, update_encoder_fr_a, CHANGE);
+  attachInterrupt(motor_fr.encoder.encoder_b, update_encoder_fr_b, CHANGE);
+  attachInterrupt(motor_bl.encoder.encoder_a, update_encoder_bl_a, CHANGE);
+  attachInterrupt(motor_bl.encoder.encoder_b, update_encoder_bl_b, CHANGE);
+  attachInterrupt(motor_fl.encoder.encoder_a, update_encoder_fl_a, CHANGE);
+  attachInterrupt(motor_fl.encoder.encoder_b, update_encoder_fl_b, CHANGE);
+  
   Serial.begin(9600);
   pinMode(LED, OUTPUT);
 
@@ -89,11 +79,10 @@ void loop() {
 //  motorFL.turn(50);
 //  char buf[256];
   xbee.read_line(input);
- 
-  Serial.println(motorBR.position());
-  Serial.println(motorFR.position());
-  Serial.print("Right Count: ");
-  Serial.println(rightCount);
+  Serial.println(motor_br.position());
+  Serial.println(motor_fr.position());
+  Serial.println(motor_bl.position());
+  Serial.println(motor_fl.position());
   Serial.println();
   Serial.print(input[0]);
   Serial.print(",");
@@ -104,31 +93,10 @@ void loop() {
   Serial.print(input[3]);
   Serial.println("");
   motion.move(input[1], input[2], input[3]);
-  delay(30);
-  /*
-  digitalWrite(LED, HIGH);
-  motorBR.turn(50);
-  motorFR.turn(50);
-  motorBL.turn(50);
-  motorFL.turn(50);
-  delay(1000);
-  digitalWrite(LED, LOW);
-  motorBR.turn(-50);
-  motorFR.turn(-50);
-  motorBL.turn(-50);
-  motorFL.turn(-50);
-  delay(1000);
-  */
-  // put your main code here, to run repeatedly:
-//  int input[4];
-//  xbee.read_line(input);
-//  int id = input[0];
-//  int* v = &input[1];
-
-//  char buf[256];
-//  xbee.read_raw(buf);
-//  Serial.println(buf);
-//  
-//  motorBL.turn(50);  
-
+  motor_br.reset_position();
+  motor_fr.reset_position();
+  motor_bl.reset_position();
+  motor_fl.reset_position();
+  delay(100);
+  
 }
