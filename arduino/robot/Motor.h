@@ -24,10 +24,6 @@ private:
     int ccw;
     int enable;
     int spd;
-    double pid_input;
-    double pid_output;
-    double pid_set;
-    PID pid;
 };
 
 #endif

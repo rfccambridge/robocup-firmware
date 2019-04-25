@@ -3,7 +3,7 @@
 
 Motor::Motor(int mcp_addr, int motor_addr, int cw_addr, int ccw_addr, int enable_addr,
              int spd_addr, int encoder_a, int encoder_b)
-    : encoder(encoder_a, encoder_b), pid(&pid_input, &pid_output, &pid_set, 1, 0, 0, DIRECT) {
+    : encoder(encoder_a, encoder_b) {
     // pins are 1 indexed for CW, CCW, enable
     mcp = mcp_addr;
     motor = motor_addr;
@@ -11,7 +11,6 @@ Motor::Motor(int mcp_addr, int motor_addr, int cw_addr, int ccw_addr, int enable
     ccw = ccw_addr;
     enable = enable_addr;
     spd = spd_addr;
-    pid.SetOutputLimits(-SPEED_CAP, SPEED_CAP);
 }
 
 void Motor::setup() {
@@ -26,7 +25,6 @@ void Motor::setup() {
     Wire.endTransmission();
     pinMode(spd, OUTPUT);
     encoder.write(0);
-    pid.SetMode(AUTOMATIC);
 }
 
 void Motor::turn(int turn_spd) {
@@ -40,7 +38,6 @@ void Motor::turn(int turn_spd) {
     Wire.write(motor); 
     Wire.write(command);
     Wire.endTransmission();
-    // analogWrite(spd, abs(pid_output));
 }
 
 int Motor::position() {

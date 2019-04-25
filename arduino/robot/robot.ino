@@ -14,6 +14,7 @@ Motor motor_bl(0x24, 0x12, 112, 224, 5, 10, 14, 15);
 Motor motor_fl(0x24, 0x13, 14,    7, 4, 29, 25, 26);
 
 
+
 // Motion(Motor& br, Motor& fr, Motor& bl, Motor& fl);
 Motion motion(motor_br, motor_fr, motor_bl, motor_fl);
 XBEE xbee(5);
@@ -35,6 +36,9 @@ void setup() {
   motor_fr.setup();
   motor_bl.setup();
   motor_fl.setup();
+
+  // initialize pid
+  motion.setup(0.0, 0.0, 5.0);
   
   attachInterrupt(motor_br.encoder.encoder_a, update_encoder_br_a, CHANGE);
   attachInterrupt(motor_br.encoder.encoder_b, update_encoder_br_b, CHANGE);
@@ -51,52 +55,49 @@ void setup() {
   for (int i = 0; i < 4; i++) {
     input[i] = 0;
   }
-
   
 }
 
 void loop() {
   digitalWrite(LED, HIGH);
-  /* Test if things are clockwise or counter */
-//  motorBR.turn(50);
-//  delay(500);
-//  motorBR.turn(0);
-//  
-//   motorFR.turn(55);
-//  delay(500);
-//  motorFR.turn(0);
-//  
-//  motorBL.turn(50);
-//  delay(500);
-//  motorBL.turn(0);
-//  motorFL.turn(50); 
-//  delay(500);
-//  motorFL.turn(0); 
-
-//  motorBR.turn(50);
-//  motorFR.turn(50);
-//  motorBL.turn(50);
-//  motorFL.turn(50);
-//  char buf[256];
   xbee.read_line(input);
-  Serial.println(motor_br.position());
-  Serial.println(motor_fr.position());
-  Serial.println(motor_bl.position());
-  Serial.println(motor_fl.position());
-  Serial.println();
-  Serial.print(input[0]);
-  Serial.print(",");
-  Serial.print(input[1]);
-  Serial.print(",");
-  Serial.print(input[2]);
-  Serial.print(",");
-  Serial.print(input[3]);
-  Serial.println("");
   motion.move(input[1], input[2], input[3]);
-  motor_br.reset_position();
-  motor_fr.reset_position();
-  motor_bl.reset_position();
-  motor_fl.reset_position();
-  delay(100);
-  
+  // need a tiny delay or the motion will think NaN speed lol
+  delay(10);
 }
+
+/* Some test code for initial encoder */
+//  xbee.read_line(input);
+//  Serial.println(motor_br.position());
+//  Serial.println(motor_fr.position());
+//  Serial.println(motor_bl.position());
+//  Serial.println(motor_fl.position());
+//  Serial.println();
+//  Serial.print(input[0]);
+//  Serial.print(",");
+//  Serial.print(input[1]);
+//  Serial.print(",");
+//  Serial.print(input[2]);
+//  Serial.print(",");
+//  Serial.print(input[3]);
+//  Serial.println("");
+//  motion.move(input[1], input[2], input[3]);
+//  motor_br.reset_position();
+//  motor_fr.reset_position();
+//  motor_bl.reset_position();
+//  motor_fl.reset_position();
+//  delay(100);
+
+
+/* Some test code for initial PID */
+//  Serial.print("PID Output: ");
+//  Serial.print(pid_out);
+//  motor_br.turn(pid_out);
+//  int ticks = motor_br.position();
+//  double tps = (double) ticks;
+//  pid_in = tps;
+//  Serial.print("  Actual TPS: ");
+//  Serial.println(tps);
+//  motor_br.reset_position();
+//  myPID.Compute();
+//  delay(50);

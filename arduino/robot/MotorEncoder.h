@@ -2,7 +2,6 @@
 #define MotorEncoder_h
 
 #include "Arduino.h"
-#include "Encoder.h"
 
 
 class MotorEncoder {
