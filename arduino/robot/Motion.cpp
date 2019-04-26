@@ -2,7 +2,7 @@
 #include "Arduino.h"
 #include "PID_v1.h"
 
-// #define MOTION_DEBUGGING
+#define MOTION_DEBUGGING
 
 Motion::Motion(Motor& br_motor, Motor& fr_motor, Motor& bl_motor, Motor& fl_motor) 
                : br(br_motor), fr(fr_motor), bl(bl_motor), fl(fl_motor) {
@@ -49,6 +49,17 @@ void Motion::stop() {
     fr.stop(); 
 }
 
+void Motion::move_raw(int x, int y, int w) {
+  setpoint_bl = (-x * sin(THETA) + y * cos(THETA) + ROTATION_SCALE * w);
+  setpoint_fl = (x * sin(THETA) + y * cos(THETA) + ROTATION_SCALE * w);
+  setpoint_fr = (x * sin(THETA) - y * cos(THETA) + ROTATION_SCALE * w);
+  setpoint_br = (-x * sin(THETA) - y * cos(THETA) + ROTATION_SCALE * w);
+  bl.turn(setpoint_bl);
+  fl.turn(setpoint_fl);
+  fr.turn(setpoint_fr);
+  br.turn(setpoint_br);
+}
+
 void Motion::move(int x, int y, int w) {
     double delta_time = millis() - time_ms;
     if (delta_time == 0) {
@@ -58,10 +69,10 @@ void Motion::move(int x, int y, int w) {
         pid_fr_in = 0;
     } else {
         // units we will be using is revolutions per second
-        pid_br_in = ((double) bl.position()) / delta_time * 1000.0;
-        pid_fl_in = ((double) fl.position()) / delta_time * 1000.0;
-        pid_br_in = ((double) br.position()) / delta_time * 1000.0;
-        pid_fr_in = ((double) fr.position()) / delta_time * 1000.0;
+        pid_br_in = bl.position_revs() / delta_time * 1000; 
+        pid_fl_in = fl.position_revs() / delta_time * 1000; 
+        pid_br_in = br.position_revs() / delta_time * 1000; 
+        pid_fr_in = fr.position_revs() / delta_time * 1000; 
     }
     // """Pass in movements in revolutions per second now"""
     setpoint_bl = (-x * sin(THETA) + y * cos(THETA) + ROTATION_SCALE * w);
@@ -79,6 +90,10 @@ void Motion::move(int x, int y, int w) {
     fr.turn(pid_fr_out);
 
     #ifdef MOTION_DEBUGGING
+        /*Serial.println(br.position_revs());
+        Serial.println(bl.position_revs());
+        Serial.println(fr.position_revs());
+        Serial.println(fl.position_revs());*/
         Serial.print(pid_br_in);
         Serial.print("       ");
         Serial.print(pid_br_out);

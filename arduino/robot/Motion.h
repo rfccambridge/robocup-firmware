@@ -7,9 +7,12 @@
 #define ROTATION_SCALE 1
 #define THETA 75.0 / 2 * PI / 180
 
+#define TICKS_PER_REV 465
+
 class Motion {
 public:
     Motion(Motor& br, Motor& fr, Motor& bl, Motor& fl);
+    void move_raw(int, int, int);
     void move(int, int, int);
     void setup(double k_p, double k_i, double k_d);
     void stop();

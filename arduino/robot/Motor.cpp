@@ -40,8 +40,12 @@ void Motor::turn(int turn_spd) {
     Wire.endTransmission();
 }
 
-int Motor::position() {
+int Motor::position_ticks() {
     return encoder.read();
+}
+
+double Motor::position_revs() {
+    return (double)encoder.read() / TICKS_PER_REV;
 }
 
 void Motor::reset_position() {

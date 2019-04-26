@@ -19,8 +19,12 @@ void XBEE::read_line(int* input) {
         char buf[BUF_SZ];
         receivedStr.toCharArray(buf, sizeof(buf));
         char *p = buf;
+        // first number is robot id
         input[0] = String(strtok_r(p, ",", &p)).toInt();
-        for (int i = 1; i < 4; i++){
+        // second number is command type
+        input[1] = String(strtok_r(p, ",", &p)).toInt();
+        // rest are args
+        for (int i = 2; i < 5; i++){
             input[i] = String(strtok_r(p, ",", &p)).toInt();
         }
     }

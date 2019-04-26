@@ -1,6 +1,6 @@
 #ifndef XBEE_guard_h
 #define XBEE_guard_h
-
+enum CommandType { CMD_MOVE, CMD_DRIBBLE };
 
 #include "Arduino.h"
 

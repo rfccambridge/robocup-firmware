@@ -7,6 +7,7 @@
 #include "PID_v1.h"
 
 #define SPEED_CAP 255
+#define TICKS_PER_REV 465
 
 class Motor {
 public:
@@ -14,7 +15,8 @@ public:
     void turn(int);
     void setup();
     void stop();
-    int position();
+    int position_ticks();
+    double position_revs();
     void reset_position();
     MotorEncoder encoder;
 private:
