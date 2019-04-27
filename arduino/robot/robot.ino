@@ -9,10 +9,10 @@
 // Motor::Motor(int mcp_addr, int motor_addr, int cw_addr, 
 // int ccw_addr, int enable_addr, int speed_addr, 
 // int encoder_a, int encoder_b)
-Motor motor_br(0x20, 0x13, 14,    7, 5,  2, 16, 17);
-Motor motor_fr(0x20, 0x12, 112, 224, 4,  3, 28, 27);
-Motor motor_bl(0x24, 0x12, 112, 224, 5, 10, 26, 25);
-Motor motor_fl(0x24, 0x13, 14,    7, 4, 29, 14, 15);
+Motor motor_br(0x20, 0x13, 14,    7, 2, 16, 17);
+Motor motor_fr(0x20, 0x12, 112, 224, 3, 28, 27);
+Motor motor_bl(0x24, 0x12, 112, 224, 10, 14, 15);
+Motor motor_fl(0x24, 0x13, 14,    7, 29, 26, 25);
 Dribbler dribbler(6);
 
 
@@ -20,7 +20,7 @@ Dribbler dribbler(6);
 Motion motion(motor_br, motor_fr, motor_bl, motor_fl);
 XBEE xbee(5);
 
-int input[5];
+double input[5];
 
 void update_encoder_br_a() { motor_br.encoder.update_a(); }
 void update_encoder_br_b() { motor_br.encoder.update_b(); }
@@ -39,7 +39,7 @@ void setup() {
   motor_fl.setup();
 
   // initialize pid (k_p, k_i, k_d)
-  motion.setup(50.0, 0.0, 0.0);
+  motion.setup(40.0, 0.0, 0.0);
   
   attachInterrupt(motor_br.encoder.encoder_a, update_encoder_br_a, CHANGE);
   attachInterrupt(motor_br.encoder.encoder_b, update_encoder_br_b, CHANGE);
@@ -64,16 +64,22 @@ void loop() {
   // motion.move_raw(0, 0, 50);
   xbee.read_line(input);
   // int robot_id = input[0];
-  int cmd = input[1];
+  int cmd = (int) input[1];
   if (cmd == CMD_MOVE) {
-    motion.move_raw(input[2], input[3], input[4]);
+    motion.move(input[2] / 100, input[3] / 100, input[4] / 100);
   }
   else if (cmd == CMD_DRIBBLE) {
     dribbler.spin(input[2]);
   }
+  else if (cmd == CMD_KILL) {
+    dribbler.spin(0);
+    motion.stop();
+    while(true);
+  }
   else {
     Serial.println("Unrecognized command");
   }
+
   // need a tiny delay or the motion will think NaN speed lol
   delay(50);
 }

@@ -13,19 +13,19 @@ void XBEE::setup() {
     // Serial.begin(9600);
 }
 
-void XBEE::read_line(int* input) {
+void XBEE::read_line(double* input) {
     if (Serial5.available()) { 
         String receivedStr = Serial5.readStringUntil('\n');
         char buf[BUF_SZ];
         receivedStr.toCharArray(buf, sizeof(buf));
         char *p = buf;
         // first number is robot id
-        input[0] = String(strtok_r(p, ",", &p)).toInt();
+        input[0] = String(strtok_r(p, ",", &p)).toFloat();
         // second number is command type
-        input[1] = String(strtok_r(p, ",", &p)).toInt();
+        input[1] = String(strtok_r(p, ",", &p)).toFloat();
         // rest are args
         for (int i = 2; i < 5; i++){
-            input[i] = String(strtok_r(p, ",", &p)).toInt();
+            input[i] = String(strtok_r(p, ",", &p)).toFloat();
         }
     }
 }

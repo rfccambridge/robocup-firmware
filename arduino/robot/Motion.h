@@ -12,8 +12,8 @@
 class Motion {
 public:
     Motion(Motor& br, Motor& fr, Motor& bl, Motor& fl);
-    void move_raw(int, int, int);
-    void move(int, int, int);
+    void move_raw(double, double, double);
+    void move(double, double, double);
     void setup(double k_p, double k_i, double k_d);
     void stop();
 private:

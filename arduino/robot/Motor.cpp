@@ -1,15 +1,14 @@
 #include "Arduino.h"
 #include "Motor.h"
 
-Motor::Motor(int mcp_addr, int motor_addr, int cw_addr, int ccw_addr, int enable_addr,
-             int spd_addr, int encoder_a, int encoder_b)
+Motor::Motor(int mcp_addr, int motor_addr, int cw_addr, int ccw_addr, int spd_addr, 
+             int encoder_a, int encoder_b)
     : encoder(encoder_a, encoder_b) {
     // pins are 1 indexed for CW, CCW, enable
     mcp = mcp_addr;
     motor = motor_addr;
     cw = cw_addr;
     ccw = ccw_addr;
-    enable = enable_addr;
     spd = spd_addr;
 }
 
@@ -32,7 +31,7 @@ void Motor::turn(int turn_spd) {
     if (turn_spd != 0) {
       command |= (turn_spd > 0) ? cw : ccw;
     }
-        analogWrite(spd, abs(turn_spd));
+    analogWrite(spd, abs(turn_spd));
 
     Wire.beginTransmission(mcp);
     Wire.write(motor); 

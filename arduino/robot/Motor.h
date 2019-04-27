@@ -11,7 +11,7 @@
 
 class Motor {
 public:
-    Motor(int, int, int, int, int, int, int, int);
+    Motor(int, int, int, int, int, int, int);
     void turn(int);
     void setup();
     void stop();
@@ -24,7 +24,6 @@ private:
     int motor;
     int cw;
     int ccw;
-    int enable;
     int spd;
 };
 

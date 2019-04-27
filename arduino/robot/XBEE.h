@@ -1,6 +1,6 @@
 #ifndef XBEE_guard_h
 #define XBEE_guard_h
-enum CommandType { CMD_MOVE, CMD_DRIBBLE };
+enum CommandType { CMD_MOVE, CMD_DRIBBLE, CMD_KILL };
 
 #include "Arduino.h"
 
@@ -11,7 +11,7 @@ class XBEE {
 public:
     XBEE(int);
     int id;
-    void read_line(int*);
+    void read_line(double*);
     void read_raw(char*);
     void setup();
 };

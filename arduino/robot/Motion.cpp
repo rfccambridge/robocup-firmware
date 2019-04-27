@@ -35,6 +35,10 @@ void Motion::setup(double k_p, double k_i, double k_d) {
     pid_fr->SetMode(AUTOMATIC);
     pid_bl->SetMode(AUTOMATIC);
     pid_fl->SetMode(AUTOMATIC);
+    pid_br->SetOutputLimits(-255, 255);
+    pid_fr->SetOutputLimits(-255, 255);
+    pid_bl->SetOutputLimits(-255, 255);
+    pid_fl->SetOutputLimits(-255, 255);
     br.reset_position();
     fr.reset_position();
     bl.reset_position();
@@ -49,27 +53,27 @@ void Motion::stop() {
     fr.stop(); 
 }
 
-void Motion::move_raw(int x, int y, int w) {
-  setpoint_bl = (-x * sin(THETA) + y * cos(THETA) + ROTATION_SCALE * w);
-  setpoint_fl = (x * sin(THETA) + y * cos(THETA) + ROTATION_SCALE * w);
-  setpoint_fr = (x * sin(THETA) - y * cos(THETA) + ROTATION_SCALE * w);
-  setpoint_br = (-x * sin(THETA) - y * cos(THETA) + ROTATION_SCALE * w);
-  bl.turn(setpoint_bl);
-  fl.turn(setpoint_fl);
-  fr.turn(setpoint_fr);
-  br.turn(setpoint_br);
+void Motion::move_raw(double x, double y, double w) {
+  int power_bl = (int) (-x * sin(THETA) + y * cos(THETA) + ROTATION_SCALE * w);
+  int power_fl = (int) (x * sin(THETA) + y * cos(THETA) + ROTATION_SCALE * w);
+  int power_fr = (int) (x * sin(THETA) - y * cos(THETA) + ROTATION_SCALE * w);
+  int power_br = (int) (-x * sin(THETA) - y * cos(THETA) + ROTATION_SCALE * w);
+  bl.turn(power_bl);
+  fl.turn(power_fl);
+  fr.turn(power_fr);
+  br.turn(power_br);
 }
 
-void Motion::move(int x, int y, int w) {
+void Motion::move(double x, double y, double w) {
     double delta_time = millis() - time_ms;
     if (delta_time == 0) {
-        pid_br_in = 0;
+        pid_bl_in = 0;
         pid_fl_in = 0;
         pid_br_in = 0;
         pid_fr_in = 0;
     } else {
         // units we will be using is revolutions per second
-        pid_br_in = bl.position_revs() / delta_time * 1000; 
+        pid_bl_in = bl.position_revs() / delta_time * 1000; 
         pid_fl_in = fl.position_revs() / delta_time * 1000; 
         pid_br_in = br.position_revs() / delta_time * 1000; 
         pid_fr_in = fr.position_revs() / delta_time * 1000; 
@@ -93,25 +97,33 @@ void Motion::move(int x, int y, int w) {
         /*Serial.println(br.position_revs());
         Serial.println(bl.position_revs());
         Serial.println(fr.position_revs());
-        Serial.println(fl.position_revs());*/
+        Serial.println(fl.position_revs());*/\
+        Serial.print("BR");
+        Serial.print("       ");
         Serial.print(pid_br_in);
         Serial.print("       ");
         Serial.print(pid_br_out);
         Serial.print("       ");
         Serial.println(setpoint_br);
         
+        Serial.print("BL");
+        Serial.print("       ");
         Serial.print(pid_bl_in);
         Serial.print("       ");
         Serial.print(pid_bl_out);
         Serial.print("       ");
         Serial.println(setpoint_bl);
         
+        Serial.print("FR");
+        Serial.print("       ");
         Serial.print(pid_fr_in);
         Serial.print("       ");
         Serial.print(pid_fr_out);
         Serial.print("       ");
         Serial.println(setpoint_fr);
         
+        Serial.print("FL");
+        Serial.print("       ");
         Serial.print(pid_fl_in);
         Serial.print("       ");
         Serial.print(pid_fl_out);
