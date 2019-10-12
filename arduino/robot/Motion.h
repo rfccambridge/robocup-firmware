@@ -9,6 +9,8 @@
 
 #define TICKS_PER_REV 465
 
+#define CLIP(x, min_x, max_x) max(min(x, max_x), min_x)
+
 class Motion {
 public:
     Motion(Motor& br, Motor& fr, Motor& bl, Motor& fl);
@@ -16,6 +18,7 @@ public:
     void move(double, double, double);
     void setup(double k_p, double k_i, double k_d);
     void stop();
+    void debug();
 private:
     Motor &br;
     Motor &fr;
@@ -34,7 +37,18 @@ private:
     double pid_fr_out;
     double pid_bl_out;
     double pid_fl_out;
+    double pid_kp;
+    double pid_ki;
+    double pid_br_ek;
+    double pid_fr_ek;
+    double pid_fl_ek;
+    double pid_bl_ek;
+    double pid_br_ks;
+    double pid_fr_ks;
+    double pid_fl_ks;
+    double pid_bl_ks;
     unsigned long time_ms;
+    const unsigned long loop_interval_ms = 100;
 };
 
 #endif

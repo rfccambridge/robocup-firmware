@@ -16,7 +16,7 @@ public:
     void discharge();
     // Keeps the capacitor charged to a certain percentage - makes it faster
     // to kick at the right speed.
-    void charge(double charge_level);
+    void set_charge(double charge_level);
 private:
     // Percentage of capacitor charge - should be proportional to kick power.
     // double between 0 and 1.

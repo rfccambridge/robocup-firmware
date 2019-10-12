@@ -22,6 +22,8 @@ XBEE xbee(5);
 
 double input[5];
 
+int loop_iter = 0;
+
 void update_encoder_br_a() { motor_br.encoder.update_a(); }
 void update_encoder_br_b() { motor_br.encoder.update_b(); }
 void update_encoder_fr_a() { motor_fr.encoder.update_a(); }
@@ -39,7 +41,7 @@ void setup() {
   motor_fl.setup();
 
   // initialize pid (k_p, k_i, k_d)
-  motion.setup(40.0, 0.0, 0.0);
+  motion.setup(50.0, 0.0, 0.0);
   
   attachInterrupt(motor_br.encoder.encoder_a, update_encoder_br_a, CHANGE);
   attachInterrupt(motor_br.encoder.encoder_b, update_encoder_br_b, CHANGE);
@@ -56,17 +58,29 @@ void setup() {
   for (int i = 0; i < 4; i++) {
     input[i] = 0;
   }
-  
 }
 
 void loop() {
-  digitalWrite(LED, HIGH);
-  // motion.move_raw(0, 0, 50);
+//  digitalWrite(LED, HIGH);
+//  // Serial.print("test");
+//  delay(1);
+//  digitalWrite(LED, LOW);
+//  delay(1);
+//   motion.move_raw(0, 0, 100);
+motion.move(0, 0, 1);
+  // TODO: save last command and run that up to a set duration, if no new commands
   xbee.read_line(input);
   // int robot_id = input[0];
+  // Serial.println(input[2]);
   int cmd = (int) input[1];
   if (cmd == CMD_MOVE) {
-    motion.move(input[2] / 100, input[3] / 100, input[4] / 100);
+    // Serial.print(input[2]);
+    // Serial.print('\t');
+    // Serial.print(input[3]);
+    // Serial.print('\t');
+    // Serial.print(input[4]);
+    // Serial.print('\n');
+    // motion.move(input[2], input[3], input[4]);
   }
   else if (cmd == CMD_DRIBBLE) {
     dribbler.spin(input[2]);
@@ -77,11 +91,22 @@ void loop() {
     while(true);
   }
   else {
-    Serial.println("Unrecognized command");
+    // Serial.println("Unrecognized command");
   }
 
   // need a tiny delay or the motion will think NaN speed lol
-  delay(50);
+  // Serial.println("Loop iter:");
+  Serial.println(millis());
+  loop_iter++;
+  // Serial.flush();
+  int delay_time = 10;
+  int start_time, end_time;
+  start_time = end_time = millis();
+  while(end_time - start_time < delay_time) {
+    end_time = millis();
+  }
+  
+  //delay(20);
 }
 
 /* Some test code for initial encoder */

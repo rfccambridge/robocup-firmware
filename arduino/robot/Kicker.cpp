@@ -10,6 +10,14 @@ void Kicker::discharge() {
 
 }
 
-void Kicker::kick() {
+void Kicker::kick(double charge_level) {
 
+}
+
+void Kicker::set_charge(double charge_level) {
+  
+}
+
+void Kicker::force_kick() {
+  
 }

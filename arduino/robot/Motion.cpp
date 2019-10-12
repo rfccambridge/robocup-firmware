@@ -2,7 +2,7 @@
 #include "Arduino.h"
 #include "PID_v1.h"
 
-#define MOTION_DEBUGGING
+// #define MOTION_DEBUGGING
 
 Motion::Motion(Motor& br_motor, Motor& fr_motor, Motor& bl_motor, Motor& fl_motor) 
                : br(br_motor), fr(fr_motor), bl(bl_motor), fl(fl_motor) {
@@ -23,26 +23,36 @@ void Motion::setup(double k_p, double k_i, double k_d) {
     pid_fr_out = 0;
     pid_bl_out = 0;
     pid_fl_out = 0;
-    pid_br = new PID(&pid_br_in, &pid_br_out, &setpoint_br, 0, 0, 0, DIRECT);
-    pid_fr = new PID(&pid_fr_in, &pid_fr_out, &setpoint_fr, 0, 0, 0, DIRECT);
-    pid_bl = new PID(&pid_bl_in, &pid_bl_out, &setpoint_bl, 0, 0, 0, DIRECT);
-    pid_fl = new PID(&pid_fl_in, &pid_fl_out, &setpoint_fl, 0, 0, 0, DIRECT);
-    pid_br->SetTunings(k_p, k_i, k_d);
-    pid_fr->SetTunings(k_p, k_i, k_d);
-    pid_bl->SetTunings(k_p, k_i, k_d);
-    pid_fl->SetTunings(k_p, k_i, k_d);
-    pid_br->SetMode(AUTOMATIC);
-    pid_fr->SetMode(AUTOMATIC);
-    pid_bl->SetMode(AUTOMATIC);
-    pid_fl->SetMode(AUTOMATIC);
-    pid_br->SetOutputLimits(-255, 255);
-    pid_fr->SetOutputLimits(-255, 255);
-    pid_bl->SetOutputLimits(-255, 255);
-    pid_fl->SetOutputLimits(-255, 255);
+    pid_br_ek = 0;
+    pid_fr_ek = 0;
+    pid_fl_ek = 0;
+    pid_bl_ek = 0;
+    pid_br_ks = 0;
+    pid_fr_ks = 0;
+    pid_fl_ks = 0;
+    pid_bl_ks = 0;
+    // pid_br = new PID(&pid_br_in, &pid_br_out, &setpoint_br, 0, 0, 0, DIRECT);
+    // pid_fr = new PID(&pid_fr_in, &pid_fr_out, &setpoint_fr, 0, 0, 0, DIRECT);
+    // pid_bl = new PID(&pid_bl_in, &pid_bl_out, &setpoint_bl, 0, 0, 0, DIRECT);
+    // pid_fl = new PID(&pid_fl_in, &pid_fl_out, &setpoint_fl, 0, 0, 0, DIRECT);
+    // pid_br->SetTunings(k_p, k_i, k_d);
+    // pid_fr->SetTunings(k_p, k_i, k_d);
+    // pid_bl->SetTunings(k_p, k_i, k_d);
+    // pid_fl->SetTunings(k_p, k_i, k_d);
+    // pid_br->SetMode(AUTOMATIC);
+    // pid_fr->SetMode(AUTOMATIC);
+    // pid_bl->SetMode(AUTOMATIC);
+    // pid_fl->SetMode(AUTOMATIC);
+    // pid_br->SetOutputLimits(-0, 255);
+    // pid_fr->SetOutputLimits(-0, 255);
+    // pid_bl->SetOutputLimits(-0, 255);
+    // pid_fl->SetOutputLimits(-0, 255);
     br.reset_position();
     fr.reset_position();
     bl.reset_position();
     fl.reset_position();
+    pid_kp = k_p;
+    pid_ki = k_i;
     time_ms = millis();
 }
 
@@ -65,28 +75,55 @@ void Motion::move_raw(double x, double y, double w) {
 }
 
 void Motion::move(double x, double y, double w) {
-    double delta_time = millis() - time_ms;
-    if (delta_time == 0) {
-        pid_bl_in = 0;
-        pid_fl_in = 0;
-        pid_br_in = 0;
-        pid_fr_in = 0;
-    } else {
-        // units we will be using is revolutions per second
-        pid_bl_in = bl.position_revs() / delta_time * 1000; 
-        pid_fl_in = fl.position_revs() / delta_time * 1000; 
-        pid_br_in = br.position_revs() / delta_time * 1000; 
-        pid_fr_in = fr.position_revs() / delta_time * 1000; 
-    }
-    // """Pass in movements in revolutions per second now"""
+    double delta_time;
+    // don't think it makes sense to delay here, since overall loop will be calling move() repeatedly...
+    /*while (millis() - time_ms < loop_interval_ms) {
+      delay(10);
+    }*/
+    // Need to make this a reasonable time window for encoder readings
+    delta_time = millis() - time_ms;
+    // input encoder speed measurements (revolutions per second)
+    pid_bl_in = bl.position_revs() / delta_time * 1000; 
+    pid_fl_in = fl.position_revs() / delta_time * 1000; 
+    pid_br_in = br.position_revs() / delta_time * 1000; 
+    pid_fr_in = fr.position_revs() / delta_time * 1000; 
+   
+    // set desired rotation speeds (revolutions per second now)
     setpoint_bl = (-x * sin(THETA) + y * cos(THETA) + ROTATION_SCALE * w);
     setpoint_fl = (x * sin(THETA) + y * cos(THETA) + ROTATION_SCALE * w);
     setpoint_fr = (x * sin(THETA) - y * cos(THETA) + ROTATION_SCALE * w);
     setpoint_br = (-x * sin(THETA) - y * cos(THETA) + ROTATION_SCALE * w);
-    pid_bl->Compute();
-    pid_fl->Compute();
-    pid_fr->Compute();
-    pid_br->Compute();
+    // pid_bl->Compute();
+    // pid_fl->Compute();
+    // pid_fr->Compute();
+    // pid_br->Compute();
+
+    pid_bl_ek = setpoint_bl - pid_bl_in;
+    pid_fl_ek = setpoint_fl - pid_fl_in;
+    pid_br_ek = setpoint_br - pid_br_in;
+    pid_fr_ek = setpoint_fr - pid_fr_in;
+
+    // pid_bl_ek = setpoint_bl;
+    // pid_fl_ek = setpoint_fl;
+    // pid_br_ek = setpoint_br;
+    // pid_fr_ek = setpoint_fr;
+
+    pid_bl_ks += pid_bl_ek;
+    pid_fl_ks += pid_fl_ek;
+    pid_br_ks += pid_br_ek;
+    pid_fr_ks += pid_fr_ek;
+
+    // TODO: CLIP AT SOME OTHER CONSTANT
+    pid_bl_ks = CLIP(pid_bl_ks, -255, 255);
+    pid_fl_ks = CLIP(pid_fl_ks, -255, 255);
+    pid_br_ks = CLIP(pid_br_ks, -255, 255);
+    pid_fr_ks = CLIP(pid_fr_ks, -255, 255);
+
+
+    pid_bl_out = pid_bl_ek * pid_kp + pid_bl_ks * pid_ki;
+    pid_fl_out = pid_fl_ek * pid_kp + pid_fl_ks * pid_ki;
+    pid_br_out = pid_br_ek * pid_kp + pid_br_ks * pid_ki;
+    pid_fr_out = pid_fr_ek * pid_kp + pid_fr_ks * pid_ki;
 
     bl.turn(pid_bl_out);
     br.turn(pid_br_out);
@@ -94,10 +131,22 @@ void Motion::move(double x, double y, double w) {
     fr.turn(pid_fr_out);
 
     #ifdef MOTION_DEBUGGING
-        /*Serial.println(br.position_revs());
+        debug();
+    #endif // DEBUG
+
+    // reset encoder counts and get time again
+    bl.reset_position();
+    fl.reset_position();
+    fr.reset_position();
+    br.reset_position();
+    time_ms = millis();
+}
+
+void Motion::debug() {
+  /*Serial.println(br.position_revs());
         Serial.println(bl.position_revs());
         Serial.println(fr.position_revs());
-        Serial.println(fl.position_revs());*/\
+        Serial.println(fl.position_revs());*/
         Serial.print("BR");
         Serial.print("       ");
         Serial.print(pid_br_in);
@@ -130,12 +179,4 @@ void Motion::move(double x, double y, double w) {
         Serial.print("       ");
         Serial.println(setpoint_fl);
         Serial.println("=====================");
-    #endif // DEBUG
-
-    // reset encoder counts and get time again
-    bl.reset_position();
-    fl.reset_position();
-    fr.reset_position();
-    br.reset_position();
-    time_ms = millis();
 }
