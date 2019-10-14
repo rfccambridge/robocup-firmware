@@ -3,6 +3,8 @@
 #include "PID_v1.h"
 
 // #define MOTION_DEBUGGING
+#define KI_LIMIT 1.0
+#define PWM_LIMIT 255
 
 Motion::Motion(Motor& br_motor, Motor& fr_motor, Motor& bl_motor, Motor& fl_motor) 
                : br(br_motor), fr(fr_motor), bl(bl_motor), fl(fl_motor) {
@@ -53,7 +55,7 @@ void Motion::setup(double k_p, double k_i, double k_d) {
     fl.reset_position();
     pid_kp = k_p;
     pid_ki = k_i;
-    time_ms = millis();
+    time_micros = micros();
 }
 
 void Motion::stop() {
@@ -75,18 +77,14 @@ void Motion::move_raw(double x, double y, double w) {
 }
 
 void Motion::move(double x, double y, double w) {
-    double delta_time;
-    // don't think it makes sense to delay here, since overall loop will be calling move() repeatedly...
-    /*while (millis() - time_ms < loop_interval_ms) {
-      delay(10);
-    }*/
+    double delta_seconds;
     // Need to make this a reasonable time window for encoder readings
-    delta_time = millis() - time_ms;
+    delta_seconds = (micros() - time_micros) / 1000000.0;
     // input encoder speed measurements (revolutions per second)
-    pid_bl_in = bl.position_revs() / delta_time * 1000; 
-    pid_fl_in = fl.position_revs() / delta_time * 1000; 
-    pid_br_in = br.position_revs() / delta_time * 1000; 
-    pid_fr_in = fr.position_revs() / delta_time * 1000; 
+    pid_bl_in = bl.position_revs() / delta_seconds; 
+    pid_fl_in = fl.position_revs() / delta_seconds; 
+    pid_br_in = br.position_revs() / delta_seconds; 
+    pid_fr_in = fr.position_revs() / delta_seconds; 
    
     // set desired rotation speeds (revolutions per second now)
     setpoint_bl = (-x * sin(THETA) + y * cos(THETA) + ROTATION_SCALE * w);
@@ -113,17 +111,25 @@ void Motion::move(double x, double y, double w) {
     pid_br_ks += pid_br_ek;
     pid_fr_ks += pid_fr_ek;
 
-    // TODO: CLIP AT SOME OTHER CONSTANT
-    pid_bl_ks = CLIP(pid_bl_ks, -255, 255);
-    pid_fl_ks = CLIP(pid_fl_ks, -255, 255);
-    pid_br_ks = CLIP(pid_br_ks, -255, 255);
-    pid_fr_ks = CLIP(pid_fr_ks, -255, 255);
+    // clip integral factor at a limit
+    // TODO: reset accumulations (ks) once a new command is given!!!
+    pid_bl_ks = CLIP(pid_bl_ks, -KI_LIMIT, KI_LIMIT);
+    pid_fl_ks = CLIP(pid_fl_ks, -KI_LIMIT, KI_LIMIT);
+    pid_br_ks = CLIP(pid_br_ks, -KI_LIMIT, KI_LIMIT);
+    pid_fr_ks = CLIP(pid_fr_ks, -KI_LIMIT, KI_LIMIT);
 
 
     pid_bl_out = pid_bl_ek * pid_kp + pid_bl_ks * pid_ki;
     pid_fl_out = pid_fl_ek * pid_kp + pid_fl_ks * pid_ki;
     pid_br_out = pid_br_ek * pid_kp + pid_br_ks * pid_ki;
     pid_fr_out = pid_fr_ek * pid_kp + pid_fr_ks * pid_ki;
+
+    pid_bl_ks = CLIP(pid_bl_out, -PWM_LIMIT, PWM_LIMIT);
+    pid_fl_ks = CLIP(pid_fl_out, -PWM_LIMIT, PWM_LIMIT);
+    pid_br_ks = CLIP(pid_br_out, -PWM_LIMIT, PWM_LIMIT);
+    pid_fr_ks = CLIP(pid_fr_out, -PWM_LIMIT, PWM_LIMIT);
+
+    // pid_bl_out = max(pid_bl_out, 0);
 
     bl.turn(pid_bl_out);
     br.turn(pid_br_out);
@@ -139,7 +145,7 @@ void Motion::move(double x, double y, double w) {
     fl.reset_position();
     fr.reset_position();
     br.reset_position();
-    time_ms = millis();
+    time_micros = micros();
 }
 
 void Motion::debug() {

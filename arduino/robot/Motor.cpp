@@ -1,6 +1,8 @@
 #include "Arduino.h"
 #include "Motor.h"
 
+#define MOTOR_LOW_LIMIT 1
+
 Motor::Motor(int mcp_addr, int motor_addr, int cw_addr, int ccw_addr, int spd_addr, 
              int encoder_a, int encoder_b)
     : encoder(encoder_a, encoder_b) {
@@ -27,6 +29,9 @@ void Motor::setup() {
 }
 
 void Motor::turn(int turn_spd) {
+    if (abs(turn_spd) < MOTOR_LOW_LIMIT) {
+      turn_spd = 0;
+    }
     unsigned int command = 0;
     if (turn_spd != 0) {
       command |= (turn_spd > 0) ? cw : ccw;

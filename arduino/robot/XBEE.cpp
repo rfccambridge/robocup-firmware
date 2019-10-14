@@ -14,7 +14,7 @@ void XBEE::setup() {
 }
 
 void XBEE::read_line(double* input) {
-    if (Serial5.available()) { 
+    if (Serial5.available()) {
         String receivedStr = Serial5.readStringUntil('\n');
         char buf[BUF_SZ];
         receivedStr.toCharArray(buf, sizeof(buf));

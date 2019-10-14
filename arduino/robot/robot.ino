@@ -3,8 +3,10 @@
 #include "MotorEncoder.h"
 #include "Motor.h"
 #include "Dribbler.h"
+#include "TimerOne.h"
 
 #define LED 13
+#define ROBOT_ID 8 // Change per robot
 
 // Motor::Motor(int mcp_addr, int motor_addr, int cw_addr, 
 // int ccw_addr, int enable_addr, int speed_addr, 
@@ -20,9 +22,9 @@ Dribbler dribbler(6);
 Motion motion(motor_br, motor_fr, motor_bl, motor_fl);
 XBEE xbee(5);
 
-double input[5];
-
-int loop_iter = 0;
+double latestCommand[5] = { 0 };
+double latestMoveXYW[3] = { 0 };
+// TODO: store timestamp, so we can expire after .2 seconds or so
 
 void update_encoder_br_a() { motor_br.encoder.update_a(); }
 void update_encoder_br_b() { motor_br.encoder.update_b(); }
@@ -41,7 +43,7 @@ void setup() {
   motor_fl.setup();
 
   // initialize pid (k_p, k_i, k_d)
-  motion.setup(50.0, 0.0, 0.0);
+  motion.setup(90.0, 0.0, 0.0);
   
   attachInterrupt(motor_br.encoder.encoder_a, update_encoder_br_a, CHANGE);
   attachInterrupt(motor_br.encoder.encoder_b, update_encoder_br_b, CHANGE);
@@ -51,62 +53,64 @@ void setup() {
   attachInterrupt(motor_bl.encoder.encoder_b, update_encoder_bl_b, CHANGE);
   attachInterrupt(motor_fl.encoder.encoder_a, update_encoder_fl_a, CHANGE);
   attachInterrupt(motor_fl.encoder.encoder_b, update_encoder_fl_b, CHANGE);
+
+  // use timer interrupts to make sure PID movement is being updated consistently
+  Timer1.initialize(2000); // WHY things start getting weird below 3ms
+  Timer1.attachInterrupt(movePIDCallback);
   
   Serial.begin(9600);
   pinMode(LED, OUTPUT);
+}
 
-  for (int i = 0; i < 4; i++) {
-    input[i] = 0;
-  }
+void movePIDCallback() {
+  /* Serial.print(latestMoveXYW[0]);
+  Serial.print(latestMoveXYW[1]);
+  Serial.println(latestMoveXYW[2]); */
+  // motion.move(0, 5, 0); 
+  motion.move(latestMoveXYW[0], latestMoveXYW[1], latestMoveXYW[2]); 
 }
 
 void loop() {
-//  digitalWrite(LED, HIGH);
+  digitalWrite(LED, HIGH);
 //  // Serial.print("test");
-//  delay(1);
+//  delay(100);
 //  digitalWrite(LED, LOW);
-//  delay(1);
-//   motion.move_raw(0, 0, 100);
-motion.move(0, 0, 1);
-  // TODO: save last command and run that up to a set duration, if no new commands
-  xbee.read_line(input);
-  // int robot_id = input[0];
-  // Serial.println(input[2]);
-  int cmd = (int) input[1];
-  if (cmd == CMD_MOVE) {
-    // Serial.print(input[2]);
-    // Serial.print('\t');
-    // Serial.print(input[3]);
-    // Serial.print('\t');
-    // Serial.print(input[4]);
-    // Serial.print('\n');
-    // motion.move(input[2], input[3], input[4]);
-  }
-  else if (cmd == CMD_DRIBBLE) {
-    dribbler.spin(input[2]);
-  }
-  else if (cmd == CMD_KILL) {
-    dribbler.spin(0);
-    motion.stop();
-    while(true);
-  }
-  else {
-    // Serial.println("Unrecognized command");
+//  delay(100);
+  // motion.move_raw(0, 0, 70);
+    
+  // Read latest command from xbee into global variable "input"
+  xbee.read_line(latestCommand);
+  int robot_id = latestCommand[0];
+  int cmd = (int) latestCommand[1];
+  if (robot_id == -1 || robot_id == ROBOT_ID) {
+    if (cmd == CMD_MOVE) {
+      // save movement commands, let the timer interrupt execute it
+      // RIGHT NOW ITS RECEIVING INTERMITTENT 0's FROM GAMECONTROLLER SOMEHOW 
+      latestMoveXYW[0] = latestCommand[2];
+      latestMoveXYW[1] = latestCommand[3];
+      latestMoveXYW[2] = latestCommand[4];
+    }
+    else if (cmd == CMD_DRIBBLE) {
+      dribbler.spin(latestCommand[2]);
+    }
+    else if (cmd == CMD_KILL) {
+      dribbler.spin(0);
+      motion.stop();
+      while(true);
+    }
+    else {
+      // Serial.println("Unrecognized command");
+    }
   }
 
-  // need a tiny delay or the motion will think NaN speed lol
-  // Serial.println("Loop iter:");
-  Serial.println(millis());
-  loop_iter++;
+  // Serial.println(millis());
   // Serial.flush();
-  int delay_time = 10;
+  int delay_time = 1;
   int start_time, end_time;
   start_time = end_time = millis();
   while(end_time - start_time < delay_time) {
     end_time = millis();
   }
-  
-  //delay(20);
 }
 
 /* Some test code for initial encoder */
@@ -130,17 +134,3 @@ motion.move(0, 0, 1);
 //  motor_bl.reset_position();
 //  motor_fl.reset_position();
 //  delay(100);
-
-
-/* Some test code for initial PID */
-//  Serial.print("PID Output: ");
-//  Serial.print(pid_out);
-//  motor_br.turn(pid_out);
-//  int ticks = motor_br.position();
-//  double tps = (double) ticks;
-//  pid_in = tps;
-//  Serial.print("  Actual TPS: ");
-//  Serial.println(tps);
-//  motor_br.reset_position();
-//  myPID.Compute();
-//  delay(50);

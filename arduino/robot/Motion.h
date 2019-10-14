@@ -47,8 +47,7 @@ private:
     double pid_fr_ks;
     double pid_fl_ks;
     double pid_bl_ks;
-    unsigned long time_ms;
-    const unsigned long loop_interval_ms = 100;
+    unsigned long time_micros;
 };
 
 #endif
