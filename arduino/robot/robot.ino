@@ -17,13 +17,12 @@ Motor motor_bl(0x24, 0x12, 112, 224, 10, 14, 15);
 Motor motor_fl(0x24, 0x13, 14,    7, 29, 26, 25);
 Dribbler dribbler(6);
 
-
 // Motion(Motor& br, Motor& fr, Motor& bl, Motor& fl);
 Motion motion(motor_br, motor_fr, motor_bl, motor_fl);
 XBEE xbee(5);
 
 double latestCommand[5] = { 0 };
-double latestMoveXYW[3] = { 0 };
+int motorSetpoints[4] = { 0 };
 // TODO: store timestamp, so we can expire after .2 seconds or so
 
 void update_encoder_br_a() { motor_br.encoder.update_a(); }
@@ -41,9 +40,6 @@ void setup() {
   motor_fr.setup();
   motor_bl.setup();
   motor_fl.setup();
-
-  // initialize pid (k_p, k_i, k_d)
-  motion.setup(90.0, 0.0, 0.0);
   
   attachInterrupt(motor_br.encoder.encoder_a, update_encoder_br_a, CHANGE);
   attachInterrupt(motor_br.encoder.encoder_b, update_encoder_br_b, CHANGE);
@@ -54,6 +50,9 @@ void setup() {
   attachInterrupt(motor_fl.encoder.encoder_a, update_encoder_fl_a, CHANGE);
   attachInterrupt(motor_fl.encoder.encoder_b, update_encoder_fl_b, CHANGE);
 
+  // initialize pid constants and update frequency
+  // HZ MUST MATCH WITH TIMER INTERRUPT RATE BELOW
+  motion.setup(120.0, 0.0, 0.0, 500);
   // use timer interrupts to make sure PID movement is being updated consistently
   Timer1.initialize(2000); // WHY things start getting weird below 3ms
   Timer1.attachInterrupt(movePIDCallback);
@@ -63,11 +62,8 @@ void setup() {
 }
 
 void movePIDCallback() {
-  /* Serial.print(latestMoveXYW[0]);
-  Serial.print(latestMoveXYW[1]);
-  Serial.println(latestMoveXYW[2]); */
-  // motion.move(0, 5, 0); 
-  motion.move(latestMoveXYW[0], latestMoveXYW[1], latestMoveXYW[2]); 
+  // motion.XYW_to_setpoints(2, 0, 0, motorSetpoints);
+  motion.move_PID(motorSetpoints[0], motorSetpoints[1], motorSetpoints[2], motorSetpoints[3]); 
 }
 
 void loop() {
@@ -84,11 +80,11 @@ void loop() {
   int cmd = (int) latestCommand[1];
   if (robot_id == -1 || robot_id == ROBOT_ID) {
     if (cmd == CMD_MOVE) {
-      // save movement commands, let the timer interrupt execute it
-      // RIGHT NOW ITS RECEIVING INTERMITTENT 0's FROM GAMECONTROLLER SOMEHOW 
-      latestMoveXYW[0] = latestCommand[2];
-      latestMoveXYW[1] = latestCommand[3];
-      latestMoveXYW[2] = latestCommand[4];
+      // convert movement command into motor speed setpoints, save for timer interrupt to use
+      double x = latestCommand[2];
+      double y = latestCommand[3];
+      double w = latestCommand[4];
+      motion.XYW_to_setpoints(x, y, w, motorSetpoints);
     }
     else if (cmd == CMD_DRIBBLE) {
       dribbler.spin(latestCommand[2]);
@@ -105,7 +101,7 @@ void loop() {
 
   // Serial.println(millis());
   // Serial.flush();
-  int delay_time = 1;
+  int delay_time = 10;
   int start_time, end_time;
   start_time = end_time = millis();
   while(end_time - start_time < delay_time) {
