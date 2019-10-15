@@ -41,42 +41,20 @@ void Motion::move_raw(double x, double y, double w) {
 }
 
 // converts xyw (rotations/s) => setpoints (ticks/pid interval)
-void Motion::XYW_to_setpoints(double x, double y, double w, int* setpoints) {
-  int rps_bl = -x * sin(THETA) + y * cos(THETA) + w;
-  int rps_fl = x * sin(THETA) + y * cos(THETA) + w;
-  int rps_fr = x * sin(THETA) - y * cos(THETA) + w;
-  int rps_br = -x * sin(THETA) - y * cos(THETA) + w;
-  int tpi_bl = (int) (rps_bl * update_hz / TICKS_PER_REV);
-  int tpi_fl = (int) (rps_fl * update_hz / TICKS_PER_REV);
-  int tpi_fr = (int) (rps_fr * update_hz / TICKS_PER_REV);
-  int tpi_br = (int) (rps_br * update_hz / TICKS_PER_REV);
-  setpoints[0] = tpi_bl;
-  setpoints[1] = tpi_fl;
-  setpoints[2] = tpi_fr;
-  setpoints[3] = tpi_br;
+void Motion::XYW_to_setpoints(double x, double y, double w) {
+  double rps_bl = -x * sin(THETA) + y * cos(THETA) + w;
+  double rps_fl = x * sin(THETA) + y * cos(THETA) + w;
+  double rps_fr = x * sin(THETA) - y * cos(THETA) + w;
+  double rps_br = -x * sin(THETA) - y * cos(THETA) + w;
+  // We are forced to round speeds to multiple of 1 tick per update interval
+  // TODO: should we round small speeds up to 1 rather than down to 0?
+  setpoint_bl = (int) (rps_bl * TICKS_PER_REV / update_hz);
+  setpoint_fl = (int) (rps_fl * TICKS_PER_REV / update_hz);
+  setpoint_fr = (int) (rps_fr * TICKS_PER_REV / update_hz);
+  setpoint_br = (int) (rps_br * TICKS_PER_REV / update_hz);
 }
 
-void Motion::move_PID(int setpoint_bl, int setpoint_fl, int setpoint_fr, int setpoint_br) {
-    // put measurements into history queues (ticks in last update interval)
-    /*bl_ticks_history.unshift(bl.position_ticks());
-    fl_ticks_history.unshift(fl.position_ticks());
-    br_ticks_history.unshift(br.position_ticks());
-    fr_ticks_history.unshift(fr.position_ticks());
-
-    // decide how many update intervals back to look for PID estimations
-    int num_intervals = 10;
-    // estimate current speeds of motors (ticks/[multiple] intervals)
-    int pid_bl_in = sum_last_intervals(&bl_ticks_history, num_intervals);
-    int pid_fl_in = sum_last_intervals(&fl_ticks_history, num_intervals);
-    int pid_br_in = sum_last_intervals(&br_ticks_history, num_intervals);
-    int pid_fr_in = sum_last_intervals(&fr_ticks_history, num_intervals);
-
-    // adjust setpoints based on number of intervals we are aggregating ticks from
-    setpoint_bl *= num_intervals;
-    setpoint_fl *= num_intervals;
-    setpoint_br *= num_intervals;
-    setpoint_fr *= num_intervals;*/
-
+void Motion::update_PID() {
     int pid_bl_in = bl.position_ticks();
     int pid_fl_in = fl.position_ticks();
     int pid_br_in = br.position_ticks();
@@ -98,12 +76,4 @@ void Motion::move_PID(int setpoint_bl, int setpoint_fl, int setpoint_fr, int set
     fl.reset_position();
     fr.reset_position();
     br.reset_position();
-}
-
-int Motion::sum_last_intervals(CircularBuffer<int, TICKS_HISTORY_SIZE>* ticks_history, int num_intervals) {
-  int sum = 0;
-  for (int i = 0; i < num_intervals && i < TICKS_HISTORY_SIZE; i++) {
-    sum += (*ticks_history)[i];
-  }
-  return sum;
 }

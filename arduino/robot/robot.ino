@@ -22,8 +22,6 @@ Motion motion(motor_br, motor_fr, motor_bl, motor_fl);
 XBEE xbee(5);
 
 double latestCommand[5] = { 0 };
-int motorSetpoints[4] = { 0 };
-// TODO: store timestamp, so we can expire after .2 seconds or so
 
 void update_encoder_br_a() { motor_br.encoder.update_a(); }
 void update_encoder_br_b() { motor_br.encoder.update_b(); }
@@ -50,11 +48,13 @@ void setup() {
   attachInterrupt(motor_fl.encoder.encoder_a, update_encoder_fl_a, CHANGE);
   attachInterrupt(motor_fl.encoder.encoder_b, update_encoder_fl_b, CHANGE);
 
-  // initialize pid constants and update frequency
-  // HZ MUST MATCH WITH TIMER INTERRUPT RATE BELOW
-  motion.setup(120.0, 0.0, 0.0, 500);
+  // initialize PID constants and update frequency
+  // NOTE: PID rounds speeds to multiple of 1 tick per update interval (in XYW_to_setpoints)
+  // i.e. 200hz / 465 ticks per rev = rounds speed to multiple of .43 rotations/second
+  // HZ param MUST MATCH WITH TIMER INTERRUPT RATE BELOW
+  motion.setup(90.0, 0.0, 0, 200);
   // use timer interrupts to make sure PID movement is being updated consistently
-  Timer1.initialize(2000); // WHY things start getting weird below 3ms
+  Timer1.initialize(5000);
   Timer1.attachInterrupt(movePIDCallback);
   
   Serial.begin(9600);
@@ -62,8 +62,8 @@ void setup() {
 }
 
 void movePIDCallback() {
-  // motion.XYW_to_setpoints(2, 0, 0, motorSetpoints);
-  motion.move_PID(motorSetpoints[0], motorSetpoints[1], motorSetpoints[2], motorSetpoints[3]); 
+  // motion.XYW_to_setpoints(0, 0, 1, motorSetpoints);
+  motion.update_PID();
 }
 
 void loop() {
@@ -80,11 +80,12 @@ void loop() {
   int cmd = (int) latestCommand[1];
   if (robot_id == -1 || robot_id == ROBOT_ID) {
     if (cmd == CMD_MOVE) {
-      // convert movement command into motor speed setpoints, save for timer interrupt to use
+      // convert movement command into motor speed setpoints
+      // (timer interrupt will trigger the actual PID updates)
       double x = latestCommand[2];
       double y = latestCommand[3];
       double w = latestCommand[4];
-      motion.XYW_to_setpoints(x, y, w, motorSetpoints);
+      motion.XYW_to_setpoints(x, y, w);
     }
     else if (cmd == CMD_DRIBBLE) {
       dribbler.spin(latestCommand[2]);
@@ -108,25 +109,3 @@ void loop() {
     end_time = millis();
   }
 }
-
-/* Some test code for initial encoder */
-//  xbee.read_line(input);
-//  Serial.println(motor_br.position());
-//  Serial.println(motor_fr.position());
-//  Serial.println(motor_bl.position());
-//  Serial.println(motor_fl.position());
-//  Serial.println();
-//  Serial.print(input[0]);
-//  Serial.print(",");
-//  Serial.print(input[1]);
-//  Serial.print(",");
-//  Serial.print(input[2]);
-//  Serial.print(",");
-//  Serial.print(input[3]);
-//  Serial.println("");
-//  motion.move(input[1], input[2], input[3]);
-//  motor_br.reset_position();
-//  motor_fr.reset_position();
-//  motor_bl.reset_position();
-//  motor_fl.reset_position();
-//  delay(100);
