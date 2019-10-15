@@ -50,11 +50,11 @@ void setup() {
 
   // initialize PID constants and update frequency
   // NOTE: PID rounds speeds to multiple of 1 tick per update interval (in XYW_to_setpoints)
-  // i.e. 200hz / 465 ticks per rev = rounds speed to multiple of .43 rotations/second
+  // i.e. 250hz / 465 ticks per rev = rounds speed to multiple of .54 rotations/second
   // HZ param MUST MATCH WITH TIMER INTERRUPT RATE BELOW
-  motion.setup(90.0, 0.0, 0, 200);
+  motion.setup(60.0, 0.0, 0, 250);
   // use timer interrupts to make sure PID movement is being updated consistently
-  Timer1.initialize(5000);
+  Timer1.initialize(4000);
   Timer1.attachInterrupt(movePIDCallback);
   
   Serial.begin(9600);
@@ -62,7 +62,7 @@ void setup() {
 }
 
 void movePIDCallback() {
-  // motion.XYW_to_setpoints(0, 0, 1, motorSetpoints);
+  // motion.XYW_to_setpoints(0, 0, 0);
   motion.update_PID();
 }
 
