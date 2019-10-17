@@ -48,13 +48,13 @@ void setup() {
   attachInterrupt(motor_fl.encoder.encoder_a, update_encoder_fl_a, CHANGE);
   attachInterrupt(motor_fl.encoder.encoder_b, update_encoder_fl_b, CHANGE);
 
-  // initialize PID constants and update frequency
-  // NOTE: PID rounds speeds to multiple of 1 tick per update interval (in XYW_to_setpoints)
-  // i.e. 250hz / 465 ticks per rev = rounds speed to multiple of .54 rotations/second
-  // HZ param MUST MATCH WITH TIMER INTERRUPT RATE BELOW
-  motion.setup(60.0, 0.0, 0, 250);
+  // initialize PID constants
+  motion.setup(60.0, 0.0, 0.0); // [useable?] p-only tuning (with clearing integral windup?)
+  // i-tuning we've tried - around 30 is pretty high?
+  
   // use timer interrupts to make sure PID movement is being updated consistently
-  Timer1.initialize(4000);
+  // (interrupt rate must match with PID update loop rate for correct calculations)
+  Timer1.initialize(1000000 / PID_UPDATE_HZ);
   Timer1.attachInterrupt(movePIDCallback);
   
   Serial.begin(9600);
@@ -62,7 +62,7 @@ void setup() {
 }
 
 void movePIDCallback() {
-  // motion.XYW_to_setpoints(0, 0, 0);
+  // motion.XYW_to_setpoints(0, 0, 1);
   motion.update_PID();
 }
 
@@ -92,6 +92,7 @@ void loop() {
     }
     else if (cmd == CMD_KILL) {
       dribbler.spin(0);
+      Timer1.stop();
       motion.stop();
       while(true);
     }

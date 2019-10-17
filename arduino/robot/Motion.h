@@ -4,10 +4,11 @@
 #include "Motor.h"
 #include "FastPID.h"
 
-#define THETA 75.0 / 2 * PI / 180
+#define THETA (90 - 75.0 / 2) * PI / 180
 #define TICKS_HISTORY_SIZE 2
 
 #define TICKS_PER_REV 465
+#define PID_UPDATE_HZ 400
 
 // unused?
 #define CLIP(x, min_x, max_x) max(min(x, max_x), min_x)
@@ -18,7 +19,7 @@ public:
     void move_raw(double, double, double);
     void XYW_to_setpoints(double, double, double);
     void update_PID();
-    void setup(float k_p, float k_i, float k_d, float hz);
+    void setup(float k_p, float k_i, float k_d);
     void stop();
     void debug();
 private:
@@ -30,9 +31,8 @@ private:
     int setpoint_fl;
     int setpoint_fr;
     int setpoint_br;
-    // TODO: store timestamp, so we can expire after .2 seconds or so
+    // TODO: store timestamp, so we can expire after .2 seconds or so?
     FastPID *pid_br, *pid_fr, *pid_bl, *pid_fl;
-    int update_hz;
 };
 
 #endif
