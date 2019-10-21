@@ -55,15 +55,22 @@ void Motion::XYW_to_setpoints(double x, double y, double w) {
   double rps_br = -x * sin(THETA) - y * cos(THETA) + w;
   // We are forced to round speeds to multiple of 1 tick per update interval
   // i.e. 400hz / 465 ticks per rev = rounds speeds to multiple of .86 rotations/second
-  // Currently this is quite crude but seems the faster update rate is more important - hopefully we'll have finer encoders soon
+  // i.e. 200hz / 465 ticks per rev = rounds speeds to multiple of .43 rotations/second
+  // Too big means software cannot control the robots properly 8( NEED FINER ENCODERS!
   // TODO: should we round small speeds up to 1 rather than down to 0?
   setpoint_bl = (int) (rps_bl * TICKS_PER_REV / PID_UPDATE_HZ);
   setpoint_fl = (int) (rps_fl * TICKS_PER_REV / PID_UPDATE_HZ);
   setpoint_fr = (int) (rps_fr * TICKS_PER_REV / PID_UPDATE_HZ);
   setpoint_br = (int) (rps_br * TICKS_PER_REV / PID_UPDATE_HZ);
+  // refresh the last command time
+  last_command_ms = millis();
 }
 
 void Motion::update_PID() {
+    if (millis() - last_command_ms > TIMEOUT_MILLIS) {
+      stop();
+      return;
+    }
     int pid_bl_in = bl.position_ticks();
     int pid_fl_in = fl.position_ticks();
     int pid_br_in = br.position_ticks();
@@ -78,7 +85,6 @@ void Motion::update_PID() {
     br.turn(pid_br_out);
     fl.turn(pid_fl_out);
     fr.turn(pid_fr_out);
-    Serial.println(pid_bl_out);
 
     // reset encoder counts
     bl.reset_position();

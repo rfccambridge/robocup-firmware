@@ -49,7 +49,7 @@ void setup() {
   attachInterrupt(motor_fl.encoder.encoder_b, update_encoder_fl_b, CHANGE);
 
   // initialize PID constants
-  motion.setup(60.0, 0.0, 0.0); // [useable?] p-only tuning (with clearing integral windup?)
+  motion.setup(30.0, 0.0, 0.0); // [useable?] p-only tuning (with clearing integral windup?)
   // i-tuning we've tried - around 30 is pretty high?
   
   // use timer interrupts to make sure PID movement is being updated consistently
@@ -72,7 +72,10 @@ void loop() {
 //  delay(100);
 //  digitalWrite(LED, LOW);
 //  delay(100);
-  // motion.move_raw(0, 0, 70);
+  /*motion.move_raw(0, 500, 0);
+  delay(1000);
+  motion.move_raw(0, 0, 0);
+  delay(1000000000);*/
     
   // Read latest command from xbee into global variable "input"
   xbee.read_line(latestCommand);
