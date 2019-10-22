@@ -4,7 +4,7 @@
 #include "Motor.h"
 #include "FastPID.h"
 
-#define THETA (90 - 75.0 / 2) * PI / 180
+#define THETA (75.0 / 2) * PI / 180
 #define TICKS_HISTORY_SIZE 2
 
 #define TICKS_PER_REV 465

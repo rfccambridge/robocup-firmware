@@ -49,6 +49,7 @@ void Motion::move_raw(double x, double y, double w) {
 // This keeps update_PID function as quick as possible
 // (which is good b.c it runs repeatedly for the same setpoints)
 void Motion::XYW_to_setpoints(double x, double y, double w) {
+  // TODO: COULD LIMIT SET POINT CHANGE RATE - SEE ZHEJIANG FIRMWARE GITHUB
   double rps_bl = -x * sin(THETA) + y * cos(THETA) + w;
   double rps_fl = x * sin(THETA) + y * cos(THETA) + w;
   double rps_fr = x * sin(THETA) - y * cos(THETA) + w;
