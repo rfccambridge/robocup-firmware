@@ -45,24 +45,31 @@ void Motion::move_raw(double x, double y, double w) {
   br.turn(power_br);
 }
 
-// Converts xyw (rotations/s) => setpoints (ticks/pid interval)
+// converts radians of the robot to rps of wheel
+double Motion::radians_to_rps(double rad) {
+  return rad * (ROBOT_DIAMETER / 2) / (MM_PER_ROTATION);
+}
+
+// Converts xyw (mm/s for x and y, rad/s for w) => setpoints (ticks/pid interval)
 // This keeps update_PID function as quick as possible
 // (which is good b.c it runs repeatedly for the same setpoints)
 void Motion::XYW_to_setpoints(double x, double y, double w) {
   // TODO: COULD LIMIT SET POINT CHANGE RATE - SEE ZHEJIANG FIRMWARE GITHUB
-  double rps_bl = -x * sin(THETA) + y * cos(THETA) + w;
-  double rps_fl = x * sin(THETA) + y * cos(THETA) + w;
-  double rps_fr = x * sin(THETA) - y * cos(THETA) + w;
-  double rps_br = -x * sin(THETA) - y * cos(THETA) + w;
+  double rps_bl = -x/MM_PER_ROTATION * sin(THETA) + y/MM_PER_ROTATION * cos(THETA) + radians_to_rps(w);
+  double rps_fl = x/MM_PER_ROTATION * sin(THETA) + y/MM_PER_ROTATION * cos(THETA) + radians_to_rps(w);
+  double rps_fr = x/MM_PER_ROTATION * sin(THETA) - y/MM_PER_ROTATION * cos(THETA) + radians_to_rps(w);
+  double rps_br = -x/MM_PER_ROTATION * sin(THETA) - y/MM_PER_ROTATION * cos(THETA) + radians_to_rps(w);
   // We are forced to round speeds to multiple of 1 tick per update interval
   // i.e. 400hz / 465 ticks per rev = rounds speeds to multiple of .86 rotations/second
   // i.e. 200hz / 465 ticks per rev = rounds speeds to multiple of .43 rotations/second
   // Too big means software cannot control the robots properly 8( NEED FINER ENCODERS!
   // TODO: should we round small speeds up to 1 rather than down to 0?
+  
   setpoint_bl = (int) (rps_bl * TICKS_PER_REV / PID_UPDATE_HZ);
   setpoint_fl = (int) (rps_fl * TICKS_PER_REV / PID_UPDATE_HZ);
   setpoint_fr = (int) (rps_fr * TICKS_PER_REV / PID_UPDATE_HZ);
   setpoint_br = (int) (rps_br * TICKS_PER_REV / PID_UPDATE_HZ);
+ 
   // refresh the last command time
   last_command_ms = millis();
 }
@@ -77,6 +84,9 @@ void Motion::update_PID() {
     int pid_br_in = br.position_ticks();
     int pid_fr_in = fr.position_ticks();
 
+    // Serial.println("Setpoint:");
+    Serial.println(pid_bl_in);
+
     int pid_bl_out = pid_bl->step(setpoint_bl, pid_bl_in);
     int pid_fl_out = pid_fl->step(setpoint_fl, pid_fl_in);
     int pid_br_out = pid_br->step(setpoint_br, pid_br_in);
@@ -88,7 +98,7 @@ void Motion::update_PID() {
     fr.turn(pid_fr_out);
 
     // reset encoder counts
-    bl.reset_position();
+    //bl.reset_position();
     fl.reset_position();
     fr.reset_position();
     br.reset_position();
