@@ -18,6 +18,7 @@ Motor motor_fl(0x24, 0x13, 14,    7, 29, 26, 25);
 Dribbler dribbler(6);
 
 // Motion(Motor& br, Motor& fr, Motor& bl, Motor& fl);
+IntervalTimer PIDUpdateTimer;
 Motion motion(motor_br, motor_fr, motor_bl, motor_fl);
 XBEE xbee(5);
 
@@ -54,8 +55,9 @@ void setup() {
   
   // use timer interrupts to make sure PID movement is being updated consistently
   // (interrupt rate must match with PID update loop rate for correct calculations)
-  Timer1.initialize(1000000 / PID_UPDATE_HZ);
-  Timer1.attachInterrupt(movePIDCallback);
+  PIDUpdateTimer.begin(movePIDCallback, 1000000 / PID_UPDATE_HZ);
+  // IMPORTANT - set interrupt to lowest priority, so encoder interrupts are not missed
+  PIDUpdateTimer.priority(255);
   
   Serial.begin(9600);
   pinMode(LED, OUTPUT);

@@ -75,14 +75,16 @@ void Motion::XYW_to_setpoints(double x, double y, double w) {
 }
 
 void Motion::update_PID() {
-    if (millis() - last_command_ms > TIMEOUT_MILLIS) {
-      stop();
-      return;
-    }
     int pid_bl_in = bl.position_ticks();
     int pid_fl_in = fl.position_ticks();
     int pid_br_in = br.position_ticks();
     int pid_fr_in = fr.position_ticks();
+
+    // reset encoder counts
+    //bl.reset_position();
+    fl.reset_position();
+    fr.reset_position();
+    br.reset_position();
 
     // Serial.println("Setpoint:");
     Serial.println(pid_bl_in);
@@ -92,14 +94,13 @@ void Motion::update_PID() {
     int pid_br_out = pid_br->step(setpoint_br, pid_br_in);
     int pid_fr_out = pid_fr->step(setpoint_fr, pid_fr_in);
 
+    if (millis() - last_command_ms > TIMEOUT_MILLIS) {
+      stop();
+      return;
+    }
+    
     bl.turn(pid_bl_out);
     br.turn(pid_br_out);
     fl.turn(pid_fl_out);
     fr.turn(pid_fr_out);
-
-    // reset encoder counts
-    //bl.reset_position();
-    fl.reset_position();
-    fr.reset_position();
-    br.reset_position();
 }
