@@ -3,6 +3,7 @@
 
 #define MOTOR_LOW_LIMIT 1
 
+
 Motor::Motor(int mcp_addr, int motor_addr, int cw_addr, int ccw_addr, int spd_addr, 
              int encoder_a, int encoder_b)
     : encoder(encoder_a, encoder_b) {
@@ -29,6 +30,7 @@ void Motor::setup() {
 }
 
 void Motor::turn(int turn_spd) {
+    turn_spd *= MOTOR_POLARITY;
     if (abs(turn_spd) < MOTOR_LOW_LIMIT) {
       turn_spd = 0;
     }
@@ -45,11 +47,11 @@ void Motor::turn(int turn_spd) {
 }
 
 int Motor::position_ticks() {
-    return encoder.read();
+    return MOTOR_POLARITY*encoder.read();
 }
 
 double Motor::position_revs() {
-    return (double)encoder.read() / TICKS_PER_REV;
+    return position_ticks() / TICKS_PER_REV;
 }
 
 void Motor::reset_position() {

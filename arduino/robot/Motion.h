@@ -7,11 +7,12 @@
 #define THETA ((75.0 / 2) * (PI / 180))
 #define TICKS_HISTORY_SIZE 2
 
-#define TICKS_PER_REV 465
 #define PID_UPDATE_HZ 500
 #define TIMEOUT_MILLIS 500
 #define MM_PER_ROTATION (45*PI)
 #define ROBOT_DIAMETER 165
+// multiplies inputs and setpoints by a constant value to allow for increased setpoint granularity
+#define PID_SCALE 10
 
 // unused?
 #define CLIP(x, min_x, max_x) max(min(x, max_x), min_x)

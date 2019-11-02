@@ -50,7 +50,7 @@ void setup() {
   attachInterrupt(motor_fl.encoder.encoder_b, update_encoder_fl_b, CHANGE);
 
   // initialize PID constants
-  motion.setup(100.0, 20.0, 5.0); // [useable?] p-only tuning (with clearing integral windup?)
+  motion.setup(12.0, 0.0, 0); // [useable?] p-only tuning (with clearing integral windup?)
   // i-tuning we've tried - around 30 is pretty high?
   
   // use timer interrupts to make sure PID movement is being updated consistently
@@ -64,7 +64,7 @@ void setup() {
 }
 
 void movePIDCallback() {
-  // motion.XYW_to_setpoints(0, 0, 6.28);
+  // motion.XYW_to_setpoints(600, 0, 0);
   motion.update_PID();
 }
 

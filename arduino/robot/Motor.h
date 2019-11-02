@@ -5,9 +5,11 @@
 #include "Wire.h"
 #include "MotorEncoder.h"
 #include "PID_v1.h"
+// Sometimes motors are reversed?
+#define MOTOR_POLARITY -1
 
 #define SPEED_CAP 255
-#define TICKS_PER_REV 465
+#define TICKS_PER_REV 980
 
 class Motor {
 public:
