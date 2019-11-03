@@ -38,3 +38,10 @@ void XBEE::read_raw(char* inputbuf) {
         memcpy(inputbuf, buf, BUF_SZ);
     }
 }
+
+void XBEE::write_string(String report) {
+    if (Serial5.availableForWrite()) { 
+      Serial.println("sending report over radio");
+      Serial5.println(report);
+    }
+}

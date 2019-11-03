@@ -12,7 +12,7 @@
 #define MM_PER_ROTATION (45*PI)
 #define ROBOT_DIAMETER 165
 // multiplies inputs and setpoints by a constant value to allow for increased setpoint granularity
-#define PID_SCALE 10
+#define PID_SCALE 100
 
 // unused?
 #define CLIP(x, min_x, max_x) max(min(x, max_x), min_x)
@@ -25,7 +25,7 @@ public:
     void update_PID();
     void setup(float k_p, float k_i, float k_d);
     void stop();
-    void debug();
+    String PID_report();
 private:
     double radians_to_rps(double);
     Motor &br;
@@ -36,6 +36,10 @@ private:
     int setpoint_fl;
     int setpoint_fr;
     int setpoint_br;
+    int pid_bl_out;
+    int pid_fl_out;
+    int pid_fr_out;
+    int pid_br_out;
     FastPID *pid_br, *pid_fr, *pid_bl, *pid_fl;
     // store timestamp of last setpoint update can expire after duration?
     int last_command_ms;

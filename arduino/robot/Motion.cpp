@@ -104,12 +104,12 @@ void Motion::update_PID() {
     //Serial.println(pid_bl_in);
     //Serial.println(pid_br_in);
     //Serial.println(pid_fl_in);
-    //Serial.println(pid_fr_in);
+    // Serial.println(pid_fr_in);
     
-    int pid_bl_out = pid_bl->step(setpoint_bl, pid_bl_in);
-    int pid_fl_out = pid_fl->step(setpoint_fl, pid_fl_in);
-    int pid_br_out = pid_br->step(setpoint_br, pid_br_in);
-    int pid_fr_out = pid_fr->step(setpoint_fr, pid_fr_in);
+    pid_bl_out = pid_bl->step(setpoint_bl, pid_bl_in);
+    pid_fl_out = pid_fl->step(setpoint_fl, pid_fl_in);
+    pid_br_out = pid_br->step(setpoint_br, pid_br_in);
+    pid_fr_out = pid_fr->step(setpoint_fr, pid_fr_in);
 
     if (millis() - last_command_ms > TIMEOUT_MILLIS) {
       stop();
@@ -121,4 +121,36 @@ void Motion::update_PID() {
     fl.turn(pid_fl_out);
     fr.turn(pid_fr_out);
     // Serial.println(pid_bl_out);
+}
+
+
+/*
+ * Reports back the PID debug statistics in the following format
+ * String as a python tuple (fl, fr, bl, br), where each motor is:
+ * (unsigned int (milliseconds since start), 
+ *  motorid (str),
+ *  setpoint (int),
+ *  input (ticks/interval),
+ *  output (pwm))
+ */
+String Motion::PID_report() {
+    char report[70];
+    snprintf(
+      report, 
+      70, 
+      "((%d, %d, %d), (%d, %d, %d), (%d, %d, %d), (%d, %d, %d))",
+      setpoint_fl,
+      PID_SCALE * fl.position_ticks(),
+      pid_fl_out,
+      setpoint_fr,
+      PID_SCALE * fr.position_ticks(),
+      pid_fr_out,
+      setpoint_bl,
+      PID_SCALE * bl.position_ticks(),
+      pid_bl_out,
+      setpoint_br,
+      PID_SCALE * br.position_ticks(),
+      pid_br_out
+    );
+    return String(report);
 }

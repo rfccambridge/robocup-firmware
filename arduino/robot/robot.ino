@@ -7,6 +7,7 @@
 
 #define LED 13
 #define ROBOT_ID 8 // Change per robot
+#define DEBUG_REPORT_TIME 500
 
 // Motor::Motor(int mcp_addr, int motor_addr, int cw_addr, 
 // int ccw_addr, int enable_addr, int speed_addr, 
@@ -21,6 +22,9 @@ Dribbler dribbler(6);
 IntervalTimer PIDUpdateTimer;
 Motion motion(motor_br, motor_fr, motor_bl, motor_fl);
 XBEE xbee(5);
+
+// Used to time how fast we send debug messages back through the xbee
+unsigned long last_debug_timer = 0;
 
 double latestCommand[5] = { 0 };
 
@@ -50,7 +54,7 @@ void setup() {
   attachInterrupt(motor_fl.encoder.encoder_b, update_encoder_fl_b, CHANGE);
 
   // initialize PID constants
-  motion.setup(12.0, 0.0, 0); // [useable?] p-only tuning (with clearing integral windup?)
+  motion.setup(1.00, 0.0, 0); // [useable?] p-only tuning (with clearing integral windup?)
   // i-tuning we've tried - around 30 is pretty high?
   
   // use timer interrupts to make sure PID movement is being updated consistently
@@ -58,15 +62,18 @@ void setup() {
   PIDUpdateTimer.begin(movePIDCallback, 1000000 / PID_UPDATE_HZ);
   // IMPORTANT - set interrupt to lowest priority, so encoder interrupts are not missed
   PIDUpdateTimer.priority(255);
+
+  
   
   Serial.begin(9600);
   pinMode(LED, OUTPUT);
 }
 
 void movePIDCallback() {
-  // motion.XYW_to_setpoints(600, 0, 0);
+  // motion.XYW_to_setpoints(0, 0, 1);
   motion.update_PID();
 }
+
 
 void loop() {
   digitalWrite(LED, HIGH);
@@ -79,7 +86,12 @@ void loop() {
 //  delay(1000);
 //  motion.move_raw(0, 0, 0);
 //  delay(1000000000);
-//    
+
+  if (millis() - last_debug_timer > DEBUG_REPORT_TIME) {
+    last_debug_timer = millis();
+    Serial.println(motion.PID_report());
+    xbee.write_string(motion.PID_report());
+  }
   // Read latest command from xbee into global variable "input"
   xbee.read_line(latestCommand);
   int robot_id = latestCommand[0];
@@ -98,7 +110,7 @@ void loop() {
     }
     else if (cmd == CMD_KILL) {
       dribbler.spin(0);
-      Timer1.stop();
+      PIDUpdateTimer.end();
       motion.stop();
       while(true);
     }

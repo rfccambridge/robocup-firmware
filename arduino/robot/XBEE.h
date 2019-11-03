@@ -14,6 +14,7 @@ public:
     void read_line(double*);
     void read_raw(char*);
     void setup();
+    void write_string(String);
 };
 
 #endif
