@@ -120,7 +120,7 @@ void Motion::update_PID() {
     br.turn(pid_br_out);
     fl.turn(pid_fl_out);
     fr.turn(pid_fr_out);
-    // Serial.println(pid_bl_out);
+    Serial.print(" ");
 }
 
 
@@ -134,10 +134,11 @@ void Motion::update_PID() {
  *  output (pwm))
  */
 String Motion::PID_report() {
-    char report[70];
+  // TODO: right now the inputs are inaccurate because not being called at the exact end of the PID update intervals!
+    char report[80];
     snprintf(
       report, 
-      70, 
+      80, 
       "((%d, %d, %d), (%d, %d, %d), (%d, %d, %d), (%d, %d, %d))",
       setpoint_fl,
       PID_SCALE * fl.position_ticks(),

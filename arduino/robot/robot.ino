@@ -6,7 +6,6 @@
 #include "TimerOne.h"
 
 #define LED 13
-#define ROBOT_ID 8 // Change per robot
 #define DEBUG_REPORT_TIME 500
 
 // Motor::Motor(int mcp_addr, int motor_addr, int cw_addr, 
@@ -23,10 +22,12 @@ IntervalTimer PIDUpdateTimer;
 Motion motion(motor_br, motor_fr, motor_bl, motor_fl);
 XBEE xbee(5);
 
+#define IS_DEBUG true
+
 // Used to time how fast we send debug messages back through the xbee
 unsigned long last_debug_timer = 0;
 
-double latestCommand[5] = { 0 };
+Command latestCommand;
 
 void update_encoder_br_a() { motor_br.encoder.update_a(); }
 void update_encoder_br_b() { motor_br.encoder.update_b(); }
@@ -36,6 +37,20 @@ void update_encoder_bl_a() { motor_bl.encoder.update_a(); }
 void update_encoder_bl_b() { motor_bl.encoder.update_b(); }
 void update_encoder_fl_a() { motor_fl.encoder.update_a(); }
 void update_encoder_fl_b() { motor_fl.encoder.update_b(); }
+
+
+void debug_move_command(double x, double y, double w) {
+  Serial.print(millis());
+  Serial.print(" ");
+  Serial.print(x);
+  Serial.print(" ");
+  Serial.print(y);
+  Serial.print(" ");
+  Serial.print(w);
+  Serial.print(" ");
+  Serial.println("");
+}
+
 
 void setup() {  
   xbee.setup();
@@ -67,10 +82,11 @@ void setup() {
   
   Serial.begin(9600);
   pinMode(LED, OUTPUT);
+
+  memset((void*) &latestCommand, 0, sizeof(Command));
 }
 
 void movePIDCallback() {
-  // motion.XYW_to_setpoints(0, 0, 1);
   motion.update_PID();
 }
 
@@ -78,7 +94,6 @@ void movePIDCallback() {
 void loop() {
   digitalWrite(LED, HIGH);
   
-//  Serial.print("test\n");
 //  delay(100);
 //  digitalWrite(LED, LOW);
 //  delay(100);
@@ -86,39 +101,32 @@ void loop() {
 //  delay(1000);
 //  motion.move_raw(0, 0, 0);
 //  delay(1000000000);
+  // motion.XYW_to_setpoints(380, 320, 0);
 
   if (millis() - last_debug_timer > DEBUG_REPORT_TIME) {
     last_debug_timer = millis();
-    Serial.println(motion.PID_report());
-    xbee.write_string(motion.PID_report());
+    // Serial.println(motion.PID_report());
+    // xbee.write_string(motion.PID_report());
   }
-  // Read latest command from xbee into global variable "input"
-  xbee.read_line(latestCommand);
-  int robot_id = latestCommand[0];
-  int cmd = (int) latestCommand[1];
-  if (robot_id == -1 || robot_id == ROBOT_ID) {
-    if (cmd == CMD_MOVE) {
-      // convert movement command into motor speed setpoints
-      // (timer interrupt will trigger the actual PID updates)
-      double x = latestCommand[2];
-      double y = latestCommand[3];
-      double w = latestCommand[4];
-      motion.XYW_to_setpoints(x, y, w);
-    }
-    else if (cmd == CMD_DRIBBLE) {
-      dribbler.spin(latestCommand[2]);
-    }
-    else if (cmd == CMD_KILL) {
-      dribbler.spin(0);
-      PIDUpdateTimer.end();
-      motion.stop();
-      while(true);
-    }
-    else {
-      // Serial.println("Unrecognized command");
-    }
-  }
+  // Read latest command from xbee into global buffer
 
+  xbee.read_line(&latestCommand);
+  // convert movement command into motor speed setpoints
+  // (timer interrupt will trigger the actual PID updates)
+  double x = latestCommand.vx;
+  double y = latestCommand.vy;
+  double w = latestCommand.vw;
+  if (IS_DEBUG) {
+     // debug_move_command(x, y, w);
+  }
+  motion.XYW_to_setpoints(x, y, w);
+
+  if (latestCommand.is_dribbling) {
+    dribbler.spin(255);
+  } else {
+    dribbler.spin(0);
+  }
+  // TODO: reinstate kill command with remaining bit :P?
   // Serial.println(millis());
   // Serial.flush();
   int delay_time = 10;
