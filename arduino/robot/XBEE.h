@@ -5,7 +5,7 @@ enum CommandType { CMD_MOVE, CMD_DRIBBLE, CMD_KILL };
 #include "Arduino.h"
 
 #define XBEE_VERBOSE true
-#define BUF_SZ 40
+#define BUF_SZ 80
 
 struct Command {
   bool is_dribbling;
