@@ -22,8 +22,6 @@ IntervalTimer PIDUpdateTimer;
 Motion motion(motor_br, motor_fr, motor_bl, motor_fl);
 XBEE xbee(5);
 
-#define IS_DEBUG true
-
 // Used to time how fast we send debug messages back through the xbee
 unsigned long last_debug_timer = 0;
 
@@ -37,20 +35,6 @@ void update_encoder_bl_a() { motor_bl.encoder.update_a(); }
 void update_encoder_bl_b() { motor_bl.encoder.update_b(); }
 void update_encoder_fl_a() { motor_fl.encoder.update_a(); }
 void update_encoder_fl_b() { motor_fl.encoder.update_b(); }
-
-
-void debug_move_command(double x, double y, double w) {
-  Serial.print(millis());
-  Serial.print(" ");
-  Serial.print(x);
-  Serial.print(" ");
-  Serial.print(y);
-  Serial.print(" ");
-  Serial.print(w);
-  Serial.print(" ");
-  Serial.println("");
-}
-
 
 void setup() {  
   xbee.setup();
@@ -116,9 +100,6 @@ void loop() {
     double x = latestCommand.vx;
     double y = latestCommand.vy;
     double w = latestCommand.vw;
-    if (IS_DEBUG) {
-       debug_move_command(x, y, w);
-    }
     motion.XYW_to_setpoints(x, y, w);
   
     if (latestCommand.is_dribbling) {

@@ -23,6 +23,7 @@ public:
     Motion(Motor& br, Motor& fr, Motor& bl, Motor& fl);
     void move_raw(double, double, double);
     void XYW_to_setpoints(double, double, double);
+    void debug_move_command(double, double, double);
     void update_PID();
     void setup(float k_p, float k_i, float k_d);
     void stop();

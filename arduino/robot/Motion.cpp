@@ -8,6 +8,8 @@
 // Our I-tuning determines how fast the error builds up to the cap
 #include "FastPID.h"
 
+#define DEBUG_MOTION false
+
 Motion::Motion(Motor& br_motor, Motor& fr_motor, Motor& bl_motor, Motor& fl_motor) 
                : br(br_motor), fr(fr_motor), bl(bl_motor), fl(fl_motor) {
 }
@@ -54,6 +56,9 @@ double Motion::radians_to_rps(double rad) {
 // This keeps update_PID function as quick as possible
 // (which is good b.c it runs repeatedly for the same setpoints)
 void Motion::XYW_to_setpoints(double x, double y, double w) {
+  if (DEBUG_MOTION) {
+       debug_move_command(x, y, w);
+  }
   // TODO: COULD LIMIT SET POINT CHANGE RATE - SEE ZHEJIANG FIRMWARE GITHUB
   // First, calculate wheel speeds to move in correct x/y direction vector
   double rps_bl = -x/MM_PER_ROTATION / sin(THETA) + y/MM_PER_ROTATION / cos(THETA);
@@ -122,12 +127,24 @@ void Motion::update_PID() {
     fl.turn(pid_fl_out);
     fr.turn(pid_fr_out);
     // For some reason this is necessary for printing to work?!?!?
-    Serial.println("*");
+    Serial.println("!");
 }
 
 
+void Motion::debug_move_command(double x, double y, double w) {
+  Serial.print(millis());
+  Serial.print(" ");
+  Serial.print(x);
+  Serial.print(" ");
+  Serial.print(y);
+  Serial.print(" ");
+  Serial.print(w);
+  Serial.print(" ");
+  Serial.println("");
+}
+
 /*
- * Reports back the PID debug statistics in the following format
+ * Creates report of PID debug statistics in the following format
  * String as a python tuple (fl, fr, bl, br), where each motor is:
  * (unsigned int (milliseconds since start), 
  *  motorid (str),
