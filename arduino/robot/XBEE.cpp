@@ -1,20 +1,23 @@
 #include "Arduino.h"
 #include "XBEE.h"
 
-#define XBEE_DEBUG true
-// Match with software - keys for message verification
+#define XBEE_DEBUG false
+
+// Change + flash per robot (id corresponds to the helmet pattern)
+#define ROBOT_ID 8
+
+// Serialization constants - MUST MATCH WITH SOFTWARE
+// keys for message verification
 #define START_KEY 100
 #define END_KEY 255
-#define ROBOT_ID 8 // Change per robot
-
+#define MESSAGE_SIZE 26
+// Command value bounds
 #define MAX_X 1000
 #define MIN_X -1000
 #define MAX_Y 1000
 #define MIN_Y -1000
 #define MAX_W (2 * PI)
 #define MIN_W (-2 * PI)
-
-#define MESSAGE_SIZE 26
 
 XBEE::XBEE(int init_id) {
     id = init_id;
@@ -33,29 +36,33 @@ void print_bytes(char* c, int length) {
   Serial.println();
 }
 
-bool XBEE::read_line(Command* cmd) {
-  
+// reads and deserializes command, return whether valid command was read
+bool XBEE::read_command(Command* cmd) {
     if (Serial5.available()) {
         char buf[BUF_SZ];
         memset(buf, 0, sizeof(buf));
+        // Get potential message by reading bytes until matching the END_KEY
         size_t bytes_read = Serial5.readBytesUntil((char) END_KEY, buf, sizeof(buf));
-        // print_bytes(&buf[0], sizeof(buf));
+        if (XBEE_DEBUG) print_bytes(&buf[0], sizeof(buf));
         if (bytes_read < MESSAGE_SIZE - 1) {
-          Serial.println("Message too short");
-          Serial.println(bytes_read);
+          if (XBEE_DEBUG) {
+            Serial.print("Found END_KEY, but message too short: ");
+            Serial.println(bytes_read);
+          }
           return false;
         }
 
-        // For the sake of message correctness, we append a magic integer and a comma
-        // to the start of all of our messages.
-        // Serial.print("wfu\n");
+        // We put a magic byte START_KEY to start all of our messages.
+        // Find the first byte by going back from the END_KEY by the constant message size,
+        // and verify that this first magic byte is what we expect
         char *p = buf + bytes_read - MESSAGE_SIZE + 1;
         if (*p != START_KEY) {
-          Serial.println("START_KEY incorrect");
+          if (XBEE_DEBUG) Serial.println("Expected message start byte != START_KEY");
           return false;
         }
         p += 1; // move past start key to parse actual command
-        // See if command contains instructions for this robot_id
+        // The message contains 6 4-byte chunks, each encodes commands for one robot
+        // Search through, checking which chunk contains instructions for this robot_id
         bool foundMessage = false;
         for (int i = 0; i < 6; i++) {
           if ((15 & ((uint8_t) *p)) == ROBOT_ID) {
@@ -67,7 +74,7 @@ bool XBEE::read_line(Command* cmd) {
 
         // If no commands for this robot then return
         if (!foundMessage) {
-          Serial.println("Can't find message for this robot!!!");
+          if (XBEE_DEBUG) Serial.println("Can't find message for this robot!!!");
           return false;
         }
 
@@ -75,18 +82,20 @@ bool XBEE::read_line(Command* cmd) {
         uint8_t x = (uint8_t) p[1];
         uint8_t y = (uint8_t) p[2];
         uint8_t w = (uint8_t) p[3];
-        /*Serial.println("start");
-        Serial.println((uint8_t)p[0]);
-        Serial.println((uint8_t)p[1]);
-        Serial.println((uint8_t)p[2]);
-        Serial.println((uint8_t)p[3]);*/
+        if (XBEE_DEBUG) {
+          Serial.println("Here are the 4 bytes for this robot:");
+          Serial.println((uint8_t)p[0]);
+          Serial.println((uint8_t)p[1]);
+          Serial.println((uint8_t)p[2]);
+          Serial.println((uint8_t)p[3]);
+        }
         cmd->is_dribbling = (first_byte & (1 << 5)) != 0;
         cmd->is_charging = (first_byte & (1 << 6)) != 0;
         cmd->is_kicking = (first_byte & (1 << 7)) != 0;
         cmd->vx = (double) ((((MAX_X - MIN_X) / (double) 256) *  x) + MIN_X);
         cmd->vy = (double) ((((MAX_Y - MIN_Y) / (double) 256) *  y) + MIN_Y);
         cmd->vw = (double) ((((MAX_W - MIN_W) / (double) 256) *  w) + MIN_W);
-        print_command_struct(cmd);
+        if (XBEE_DEBUG) print_command_struct(cmd);
         return true;
     } else {
       return false;

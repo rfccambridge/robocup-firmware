@@ -1,6 +1,6 @@
 #include "Motion.h"
 #include "Arduino.h"
-// [OPTION] Limit total error to prevent integral windup in FastPid library:
+// [NOT DONE YET/OPTION] Limit total error to prevent integral windup in FastPid library:
 // FastPid.h could have this:
 // #define INTEG_MAX    C * PID_UPDATE_HZ
 // #define INTEG_MIN    -C * PID_UPDATE_HZ
@@ -111,6 +111,7 @@ void Motion::update_PID() {
     pid_br_out = pid_br->step(setpoint_br, pid_br_in);
     pid_fr_out = pid_fr->step(setpoint_fr, pid_fr_in);
 
+    // set motors speeds to 0 if have not received command
     if (millis() - last_command_ms > TIMEOUT_MILLIS) {
       stop();
       return;
@@ -120,7 +121,8 @@ void Motion::update_PID() {
     br.turn(pid_br_out);
     fl.turn(pid_fl_out);
     fr.turn(pid_fr_out);
-    // Serial.print(" ");
+    // For some reason this is necessary for printing to work?!?!?
+    Serial.println("*");
 }
 
 

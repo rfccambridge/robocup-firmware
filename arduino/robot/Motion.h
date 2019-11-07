@@ -8,6 +8,7 @@
 #define TICKS_HISTORY_SIZE 2
 
 #define PID_UPDATE_HZ 500
+// how long commands are followed for (time to live)
 #define TIMEOUT_MILLIS 500
 #define MM_PER_ROTATION (45*PI)
 #define ROBOT_DIAMETER 165

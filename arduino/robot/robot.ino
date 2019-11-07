@@ -79,7 +79,7 @@ void setup() {
   PIDUpdateTimer.priority(255);
 
   
-  
+  // according to docs, baud rate is ignored
   Serial.begin(9600);
   pinMode(LED, OUTPUT);
 
@@ -110,29 +110,30 @@ void loop() {
   }
   // Read latest command from xbee into global buffer
 
-  xbee.read_line(&latestCommand);
-  // convert movement command into motor speed setpoints
-  // (timer interrupt will trigger the actual PID updates)
-  double x = latestCommand.vx;
-  double y = latestCommand.vy;
-  double w = latestCommand.vw;
-  if (IS_DEBUG) {
-     // debug_move_command(x, y, w);
+  if (xbee.read_command(&latestCommand)) {
+    // convert movement command into motor speed setpoints
+    // (timer interrupt will trigger the actual PID updates)
+    double x = latestCommand.vx;
+    double y = latestCommand.vy;
+    double w = latestCommand.vw;
+    if (IS_DEBUG) {
+       debug_move_command(x, y, w);
+    }
+    motion.XYW_to_setpoints(x, y, w);
+  
+    if (latestCommand.is_dribbling) {
+      dribbler.spin(255);
+    } else {
+      dribbler.spin(0);
+    }
   }
-  motion.XYW_to_setpoints(x, y, w);
-
-  if (latestCommand.is_dribbling) {
-    dribbler.spin(255);
-  } else {
-    dribbler.spin(0);
-  }
-  // TODO: reinstate kill command with remaining bit :P?
-  // Serial.println(millis());
-  // Serial.flush();
+  // Delay loop (avoiding using delay() function)
   int delay_time = 10;
   int start_time, end_time;
   start_time = end_time = millis();
   while(end_time - start_time < delay_time) {
     end_time = millis();
   }
+  // Serial.println("done loop");
+  // Serial.println(millis());
 }

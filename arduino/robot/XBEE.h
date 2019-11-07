@@ -7,6 +7,7 @@ enum CommandType { CMD_MOVE, CMD_DRIBBLE, CMD_KILL };
 #define XBEE_VERBOSE true
 #define BUF_SZ 80
 
+// Matches with software robot command class
 struct Command {
   bool is_dribbling;
   bool is_charging;
@@ -21,7 +22,7 @@ class XBEE {
 public:
     XBEE(int);
     int id;
-    bool read_line(Command*);
+    bool read_command(Command*);
     void read_raw(char*);
     void setup();
     void write_string(String);
