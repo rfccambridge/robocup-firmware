@@ -7,7 +7,7 @@ Kicker::Kicker() {
 }
 
 void Kicker::discharge() {
-
+  
 }
 
 void Kicker::kick(double charge_level) {

@@ -5,7 +5,10 @@
 #include "Dribbler.h"
 #include "TimerOne.h"
 
+// must be true for robot to move, turning off helps printing?
+#define IS_PID_INTERRUPT true
 #define LED 13
+#define IS_DEBUG_REPORT false
 #define DEBUG_REPORT_TIME 500
 
 // Motor::Motor(int mcp_addr, int motor_addr, int cw_addr, 
@@ -55,13 +58,14 @@ void setup() {
   // initialize PID constants
   motion.setup(1.00, 0.0, 0); // [useable?] p-only tuning (with clearing integral windup?)
   // i-tuning we've tried - around 30 is pretty high?
-  
-  // use timer interrupts to make sure PID movement is being updated consistently
-  // (interrupt rate must match with PID update loop rate for correct calculations)
-  PIDUpdateTimer.begin(movePIDCallback, 1000000 / PID_UPDATE_HZ);
-  // IMPORTANT - set interrupt to lowest priority, so encoder interrupts are not missed
-  PIDUpdateTimer.priority(255);
 
+  if (IS_PID_INTERRUPT) {
+    // use timer interrupts to make sure PID movement is being updated consistently
+    // (interrupt rate must match with PID update loop rate for correct calculations)
+    PIDUpdateTimer.begin(movePIDCallback, 1000000 / PID_UPDATE_HZ);
+    // IMPORTANT - set interrupt to lowest priority, so encoder interrupts are not missed
+    PIDUpdateTimer.priority(255);
+  }
   
   // according to docs, baud rate is ignored
   Serial.begin(9600);
@@ -87,8 +91,9 @@ void loop() {
 //  delay(1000000000);
   // motion.XYW_to_setpoints(380, 320, 0);
 
-  if (millis() - last_debug_timer > DEBUG_REPORT_TIME) {
+  if (millis() - last_debug_timer > DEBUG_REPORT_TIME && IS_DEBUG_REPORT) {
     last_debug_timer = millis();
+    Serial.println("Debug Report!");
     // Serial.println(motion.PID_report());
     // xbee.write_string(motion.PID_report());
   }
@@ -115,6 +120,4 @@ void loop() {
   while(end_time - start_time < delay_time) {
     end_time = millis();
   }
-  // Serial.println("done loop");
-  // Serial.println(millis());
 }
