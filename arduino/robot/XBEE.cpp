@@ -7,10 +7,11 @@
 #define ROBOT_ID 8
 
 // Serialization constants - MUST MATCH WITH SOFTWARE
+#define SINGLE_ROBOT_COMMAND_LENGTH 4
+#define TEAM_COMMAND_MESSAGE_LENGTH 26
 // keys for message verification
 #define START_KEY 100
 #define END_KEY 255
-#define MESSAGE_SIZE 26
 // Command value bounds
 #define MAX_X 1000
 #define MIN_X -1000
@@ -38,7 +39,7 @@ void print_bytes(char* c, int length) {
   Serial.println();
 }
 
-// reads and deserializes command, return whether valid command was read
+// read + deserialize full team command, return if found command for this robot_id
 bool XBEE::read_command(Command* cmd) {
     if (Serial5.available()) {
         char buf[BUF_SZ];
@@ -47,7 +48,7 @@ bool XBEE::read_command(Command* cmd) {
         // Get potential message by reading bytes until matching the END_KEY
         size_t bytes_read = Serial5.readBytesUntil((char) END_KEY, buf, sizeof(buf));
         if (XBEE_DEBUG) print_bytes(&buf[0], sizeof(buf));
-        if (bytes_read < MESSAGE_SIZE - 1) {
+        if (bytes_read < TEAM_COMMAND_MESSAGE_LENGTH - 1) {
           if (XBEE_DEBUG) {
             Serial.print("Found END_KEY, but message too short: ");
             Serial.println(bytes_read);
@@ -58,13 +59,13 @@ bool XBEE::read_command(Command* cmd) {
         // We put a magic byte START_KEY to start all of our messages.
         // Find the first byte by going back from the END_KEY by the constant message size,
         // and verify that this first magic byte is what we expect
-        char *p = buf + bytes_read - MESSAGE_SIZE + 1;
+        char *p = buf + bytes_read - TEAM_COMMAND_MESSAGE_LENGTH + 1;
         if (*p != START_KEY) {
           if (XBEE_DEBUG) Serial.println("Message start byte != START_KEY");
           return false;
         }
         p += 1; // move past start key to parse actual command
-        // The message contains 6 4-byte chunks, each encodes commands for one robot
+        // The message contains 6 chunks, each encodes commands for one robot
         // Search through, checking which chunk contains instructions for this robot_id
         bool foundMessage = false;
         for (int i = 0; i < 6; i++) {
@@ -72,7 +73,7 @@ bool XBEE::read_command(Command* cmd) {
             foundMessage = true;
             break;
           }
-          p += 4;
+          p += SINGLE_ROBOT_COMMAND_LENGTH;
         }
 
         // If no commands for this robot then return
