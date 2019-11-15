@@ -6,6 +6,7 @@
 #include "MotorEncoder.h"
 #include "PID_v1.h"
 // Sometimes motors are reversed?
+// For now polarity = 1 is shaft counterclockwise for positive pwm
 #define MOTOR_POLARITY -1
 
 #define SPEED_CAP 255

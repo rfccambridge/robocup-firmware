@@ -68,10 +68,10 @@ void Motion::XYW_to_setpoints(double x, double y, double w) {
   // division compensates for inefficies to normalize at given x,y for whole robot
   
   // add the robot rotation speed to every wheel
-  rps_bl += radians_to_rps(w);
-  rps_fl += radians_to_rps(w);
-  rps_fr += radians_to_rps(w);
-  rps_br += radians_to_rps(w);
+  rps_bl -= radians_to_rps(w);
+  rps_fl -= radians_to_rps(w);
+  rps_fr -= radians_to_rps(w);
+  rps_br -= radians_to_rps(w);
   
   // We are forced to round speeds to multiple of 1 tick per update interval
   // i.e. 400hz / 465 ticks per rev = rounds speeds to multiple of .86 rotations/second

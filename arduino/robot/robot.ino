@@ -94,7 +94,8 @@ void loop() {
   if (millis() - last_debug_timer > DEBUG_REPORT_TIME && IS_DEBUG_REPORT) {
     last_debug_timer = millis();
     Serial.println("Debug Report!");
-    // Serial.println(motion.PID_report());
+    Serial.println(motion.PID_report());
+    print_command_struct(&latestCommand);
     // xbee.write_string(motion.PID_report());
   }
   // Read latest command from xbee into global buffer
