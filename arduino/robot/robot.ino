@@ -11,6 +11,7 @@
 #define LED 13
 #define IS_DEBUG_REPORT false
 #define DEBUG_REPORT_TIME 500
+#define COMMAND_TIMEOUT_MILLIS 1000
 
 // Motor::Motor(int mcp_addr, int motor_addr, int cw_addr,
 // int ccw_addr, int enable_addr, int speed_addr,
@@ -32,7 +33,7 @@ XBEE xbee(5);
 unsigned long last_debug_timer = 0;
 
 Command latestCommand;
-// store timestamp of last setpoint update can expire after duration?
+// store timestamp of last setpoint update can expire after duration
 int last_command_ms;
 
 void update_encoder_br_a() {
@@ -123,17 +124,8 @@ void loop() {
   //  motion.move_raw(0, 0, 0);
   //  delay(1000000000);
   // motion.XYW_to_setpoints(380, 320, 0);
-  
-  // stop everything if have not received command in a while
-  if (millis() - last_command_ms > COMMAND_TIMEOUT_MILLIS) {
-    latestCommand->is_dribbling = 0;
-    latestCommand->is_charging = 0;
-    latestCommand->is_kicking = 1;  // discharge for safety
-    latestCommand->vx = 0;
-    latestCommand->vy = 0;
-    latestCommand->vw = 0;
-  }
 
+  // periodic debug reporting
   if (millis() - last_debug_timer > DEBUG_REPORT_TIME && IS_DEBUG_REPORT) {
     last_debug_timer = millis();
     Serial.println("Debug Report!");
@@ -141,9 +133,23 @@ void loop() {
     print_command_struct(&latestCommand);
     xbee.write_string(motion.PID_report());
   }
-  // Read latest command from xbee into global buffer
 
+  bool is_new_command = false;
+  // stop everything if have not received command in a while
+  if (millis() - last_command_ms > COMMAND_TIMEOUT_MILLIS) {
+    is_new_command = true;
+    latestCommand.is_dribbling = 0;
+    latestCommand.is_charging = 0;
+    latestCommand.is_kicking = 1;  // discharge for safety
+    latestCommand.vx = 0;
+    latestCommand.vy = 0;
+    latestCommand.vw = 0;
+  }
+  // Read latest command from xbee into global buffer
   if (xbee.read_command(&latestCommand)) {
+    is_new_command = true;
+  }
+  if (is_new_command) {
     // refresh the last command time
     last_command_ms = millis();
     // convert movement command into motor speed setpoints
