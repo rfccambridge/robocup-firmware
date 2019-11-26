@@ -86,9 +86,6 @@ void Motion::XYW_to_setpoints(double x, double y, double w) {
 
   // Serial.print("BL Setpoint:");
   // Serial.println(setpoint_bl);
- 
-  // refresh the last command time
-  last_command_ms = millis();
 }
 
 void Motion::update_PID() {
@@ -115,12 +112,6 @@ void Motion::update_PID() {
     pid_fl_out = pid_fl->step(setpoint_fl, pid_fl_in);
     pid_br_out = pid_br->step(setpoint_br, pid_br_in);
     pid_fr_out = pid_fr->step(setpoint_fr, pid_fr_in);
-
-    // set motors speeds to 0 if have not received command
-    if (millis() - last_command_ms > TIMEOUT_MILLIS) {
-      stop();
-      return;
-    }
     
     bl.turn(pid_bl_out);
     br.turn(pid_br_out);

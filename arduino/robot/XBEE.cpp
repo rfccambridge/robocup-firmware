@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "XBEE.h"
 
-#define XBEE_DEBUG false
+#define XBEE_DEBUG true
 
 // Change + flash per robot (id corresponds to the helmet pattern)
 #define ROBOT_ID 8
@@ -135,9 +135,13 @@ void XBEE::write_string(String report) {
   if (Serial5.availableForWrite()) { 
       Serial.println("sending report over radio");
       char test_message[20];
-      strncpy("Testing\n", test_message, 20); 
-      Serial5.flush();
-      Serial5.write(test_message, 20);
-      Serial.println("Finished writing");
+      // strncpy("Testing\n", test_message, 20); 
+      // Serial5.flush();
+      Serial.println("fw00000000sh");
+      // size_t bytes_written = Serial5.write(test_message, 20);
+      size_t bytes_written = Serial5.write("test");
+      Serial.print("Finished writing");
+      Serial.print(bytes_written);
+      Serial.println("bytes");
     }
 }

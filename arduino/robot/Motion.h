@@ -8,8 +8,6 @@
 #define TICKS_HISTORY_SIZE 2
 
 #define PID_UPDATE_HZ 500
-// how long commands are followed for (time to live)
-#define TIMEOUT_MILLIS 500
 #define MM_PER_ROTATION (45*PI)
 #define ROBOT_DIAMETER 165
 // multiplies inputs and setpoints by a constant value to allow for increased setpoint granularity
@@ -43,8 +41,6 @@ private:
     int pid_fr_out;
     int pid_br_out;
     FastPID *pid_br, *pid_fr, *pid_bl, *pid_fl;
-    // store timestamp of last setpoint update can expire after duration?
-    int last_command_ms;
 };
 
 #endif
